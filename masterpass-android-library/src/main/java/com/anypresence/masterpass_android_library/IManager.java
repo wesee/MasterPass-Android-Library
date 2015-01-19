@@ -7,7 +7,7 @@ import java.util.Map;
  * Created by diego.rotondale on 1/19/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public abstract class MPManagerAbstract {
+public interface IManager {
     /**
      * Provides the server address (url) at which the MasterPass services reside
      *
@@ -48,8 +48,7 @@ public abstract class MPManagerAbstract {
      * @param success the status of the pairing
      * @param error   any errors that occurred during pairing
      */
-    void pairingDidComplete(Boolean success, Throwable error) {
-    }
+    void pairingDidComplete(Boolean success, Throwable error);
 
     /**
      * Method that executes when checkout completes
@@ -57,8 +56,7 @@ public abstract class MPManagerAbstract {
      * @param success the status of the checkout
      * @param error   any errors that occurred during checkout
      */
-    void checkoutDidComplete(Boolean success, Throwable error) {
-    }
+    void checkoutDidComplete(Boolean success, Throwable error);
 
     /**
      * Method that executes when preCheckout completes
@@ -67,8 +65,7 @@ public abstract class MPManagerAbstract {
      * @param data    the preCheckout data
      * @param error   any errors that occurred during checkout
      */
-    void preCheckoutDidComplete(Boolean success, Map<Object, Object> data, Throwable error) {
-    }
+    void preCheckoutDidComplete(Boolean success, Map<Object, Object> data, Throwable error);
 
     /**
      * Method that executes when pair & checkout completes
@@ -76,8 +73,7 @@ public abstract class MPManagerAbstract {
      * @param success the status of the checkout
      * @param error   any errors that occurred during checkout
      */
-    void pairCheckoutDidComplete(Boolean success, Throwable error) {
-    }
+    void pairCheckoutDidComplete(Boolean success, Throwable error);
 
     /**
      * Method that executes when manual checkout completes
@@ -85,15 +81,13 @@ public abstract class MPManagerAbstract {
      * @param success the status of the checkout
      * @param error   any errors that occurred during checkout
      */
-    void manualCheckoutDidComplete(Boolean success, Throwable error) {
-    }
+    void manualCheckoutDidComplete(Boolean success, Throwable error);
 
     /**
      * Method to force the reset of a user token
      * This is usually achieved by forcibly removing the
      * long access token from the user object
      */
-    void resetUserPairing() {
-    }
+    void resetUserPairing();
 
 }

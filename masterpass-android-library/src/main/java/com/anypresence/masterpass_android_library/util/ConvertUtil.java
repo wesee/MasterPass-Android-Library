@@ -8,17 +8,19 @@ import java.util.Map;
  */
 public class ConvertUtil {
     public static Integer getInteger(Map<String, Object> dictionary, String key) {
-        if (dictionary.containsKey(key)) {
-            return (Integer) dictionary.get(key);
-        }
-        return null;
+        return (Integer) getObject(dictionary, key);
     }
 
     public static String getString(Map<String, Object> dictionary, String key) {
+        String value = (String) getObject(dictionary, key);
+        if (value != null && !value.isEmpty())
+            return value;
+        return null;
+    }
+
+    public static Object getObject(Map<String, Object> dictionary, String key) {
         if (dictionary.containsKey(key)) {
-            String value = (String) dictionary.get(key);
-            if (!value.isEmpty())
-                return value;
+            return dictionary.get(key);
         }
         return null;
     }

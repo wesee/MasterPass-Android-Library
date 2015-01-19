@@ -1,14 +1,28 @@
 package com.anypresence.masterpass_android_library;
 
+import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.anypresence.masterpass_android_library.dto.LightBoxParams;
+import com.anypresence.masterpass_android_library.dto.Order;
+import com.anypresence.masterpass_android_library.dto.PairingDetails;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
+import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
-import com.anypresence.masterpass_android_library.model.MPOrder;
+import com.google.gson.Gson;
+
+import org.json.JSONObject;
+
+import java.util.Map;
 
 /**
  * Created by diego.rotondale on 1/17/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class MPManager {
+public class MPManager implements ILightBox {
     public static String DATA_TYPE_CARD = "CARD";
     public static String DATA_TYPE_ADDRESS = "ADDRESS";
     public static String DATA_TYPE_PROFILE = "PROFILE";
@@ -22,9 +36,9 @@ public class MPManager {
     public static String MP_ERROR_NOT_PAIRED = "No long access token found associated with user (user not paired with Masterpass)";
     public static Integer MPErrorCodeBadRequest = 400;
     private static MPManager instance;
-    private MPManagerAbstract delegate;
+    private IManager delegate;
 
-//Init
+    //Init
 
     /**
      * Initializes (for returns the shared instance of) the manager to interact with
@@ -38,14 +52,65 @@ public class MPManager {
         return instance;
     }
 
-//Pairing
+    //Pairing
 
     /**
-     * Opens the pairing modal over a viewcontroller.
+     * Opens the pairing modal over a viewController.
      *
-     * @param viewController The viewcontroller to show the pairing modal over
+     * @param viewController The viewController to show the pairing modal over
      */
-    void pairInViewController(ViewController viewController) {
+    void pairInViewController(final ViewController viewController) {
+        FutureCallback<PairingDetails> futureCallback = new FutureCallback<PairingDetails>() {
+            @Override
+            public void onSuccess(PairingDetails pairingDetails) {
+                LightBoxParams options = new LightBoxParams();
+                options.setRequestedDataTypes(delegate.getSupportedDataTypes());
+                options.setPairingDetails(pairingDetails);
+                options.setRequestPairing(1);
+                options.setVersion(MP_VERSION);
+                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                Log.e(MPManager.class.getSimpleName(), "Error Requesting Pairing: " + throwable.getLocalizedMessage());
+                delegate.pairingDidComplete(false, throwable);
+            }
+        };
+        this.requestPairing(futureCallback);
+    }
+
+    private void requestPairing(final FutureCallback<PairingDetails> callback) {
+        String url = delegate.getServerAddress() + "/masterpass/pair";
+        JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        String responseString = response.toString();
+                        Log.d("Approved Pairing Request: ", responseString);
+                        callback.onSuccess(new Gson().fromJson(responseString, PairingDetails.class));
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error Pairing Request: ", error.toString());
+                        callback.onFailure(error);
+                    }
+                }
+        );
+        MPLibraryApplication.getInstance().getRequestQueue().add(response);
+    }
+
+    void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
+        final MPLightBox mpLightBox = new MPLightBox();
+        mpLightBox.delegate = this;
+        viewController.presentViewController(mpLightBox, true, new OnCompleteCallback() {
+            @Override
+            public void onComplete() {
+                mpLightBox.initiateLightBoxOfTypeWithOptions(type, options);
+            }
+        });
     }
 
     /**
@@ -58,19 +123,19 @@ public class MPManager {
         return null;
     }
 
-//Return Checkout
+    //Return Checkout
 
     /**
-     * Retrieves the precheckout data from the MasterPass service
+     * Retrieves the preCheckout data from the MasterPass service
      */
     void preCheckoutDataCallback(FutureCallback callback) {
         //PreCheckoutData data
     }
 
-    void returnCheckoutForOrder(MPOrder order, ViewController viewController) {
+    void returnCheckoutForOrder(Order order, ViewController viewController) {
     }
 
-//Pair Checkout
+    //Pair Checkout
 
     void pairCheckoutForOrder(String orderNumber, ViewController viewController) {
     }
@@ -78,9 +143,25 @@ public class MPManager {
     void completePairCheckoutForOrder(String orderNumber, String transactionId, String preCheckoutTransactionId) {
     }
 
-//Manual Checkout
+    //Manual Checkout
 
     void completeManualCheckoutForOrder(String orderNumber) {
+
+    }
+
+    //ILightBox
+    @Override
+    public void pairingViewDidCompletePairing(MPLightBox pairingViewController, Boolean success, Throwable error) {
+
+    }
+
+    @Override
+    public void lightBoxDidCompletePreCheckout(MPLightBox lightBoxViewController, Boolean success, Map<Object, Object> data, Throwable error) {
+
+    }
+
+    @Override
+    public void lightBoxDidCompleteCheckout(MPLightBox pairingViewController, Boolean success, Throwable error) {
 
     }
 }

@@ -1,4 +1,4 @@
-package com.anypresence.masterpass_android_library.model;
+package com.anypresence.masterpass_android_library.dto;
 
 import java.util.List;
 import java.util.Map;
