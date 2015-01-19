@@ -6,4 +6,6 @@ package com.anypresence.masterpass_android_library.interfaces;
  */
 public interface ViewController {
     void presentViewController(ViewController presentViewController, Boolean animated, OnCompleteCallback callback);
+
+    void dismissViewControllerAnimated(boolean animated, OnCompleteCallback callback);
 }

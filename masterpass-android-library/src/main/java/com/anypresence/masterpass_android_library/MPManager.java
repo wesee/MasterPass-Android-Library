@@ -9,6 +9,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
 import com.anypresence.masterpass_android_library.dto.PairingDetails;
+import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
@@ -120,7 +121,7 @@ public class MPManager implements ILightBox {
      * @return the current pairing status
      */
     Boolean isAppPaired() {
-        return null;
+        return delegate.isAppPaired();
     }
 
     //Return Checkout
@@ -130,6 +131,10 @@ public class MPManager implements ILightBox {
      */
     void preCheckoutDataCallback(FutureCallback callback) {
         //PreCheckoutData data
+        if (!isAppPaired())
+            throw new NotPairedException();
+
+        String url = delegate.getServerAddress() + "/masterpass/precheckout";
     }
 
     void returnCheckoutForOrder(Order order, ViewController viewController) {
@@ -151,8 +156,13 @@ public class MPManager implements ILightBox {
 
     //ILightBox
     @Override
-    public void pairingViewDidCompletePairing(MPLightBox pairingViewController, Boolean success, Throwable error) {
-
+    public void pairingViewDidCompletePairing(MPLightBox pairingViewController, final Boolean success, final Throwable error) {
+        pairingViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
+            @Override
+            public void onComplete() {
+                delegate.pairingDidComplete(success, error);
+            }
+        });
     }
 
     @Override
