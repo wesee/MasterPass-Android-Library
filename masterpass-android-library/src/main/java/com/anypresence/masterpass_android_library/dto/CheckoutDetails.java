@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by diego.rotondale on 1/19/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class PairingDetails extends Details {
-    @SerializedName("pairing_request_token")
-    public String pairingRequestToken;
+public class CheckoutDetails extends Details {
+    @SerializedName("checkout_request_token")
+    public String requestToken;
 }

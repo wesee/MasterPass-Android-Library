@@ -6,15 +6,18 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.anypresence.masterpass_android_library.dto.CheckoutDetails;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
 import com.anypresence.masterpass_android_library.dto.PairingDetails;
 import com.anypresence.masterpass_android_library.dto.PreCheckoutData;
 import com.anypresence.masterpass_android_library.exception.BadRequestException;
+import com.anypresence.masterpass_android_library.exception.CheckoutException;
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
+import com.anypresence.masterpass_android_library.volleyRequest.ReturnCheckoutRequest;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -59,7 +62,7 @@ public class MPManager implements ILightBox {
      *
      * @param viewController The viewController to show the pairing modal over
      */
-    void pairInViewController(final ViewController viewController) {
+    private void pairInViewController(final ViewController viewController) {
         FutureCallback<PairingDetails> futureCallback = new FutureCallback<PairingDetails>() {
             @Override
             public void onSuccess(PairingDetails pairingDetails) {
@@ -102,7 +105,7 @@ public class MPManager implements ILightBox {
         MPLibraryApplication.getInstance().getRequestQueue().add(response);
     }
 
-    void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
+    private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
         final MPLightBox mpLightBox = new MPLightBox();
         mpLightBox.delegate = this;
         viewController.presentViewController(mpLightBox, true, new OnCompleteCallback() {
@@ -119,7 +122,7 @@ public class MPManager implements ILightBox {
      *
      * @return the current pairing status
      */
-    Boolean isAppPaired() {
+    private Boolean isAppPaired() {
         return delegate.isAppPaired();
     }
 
@@ -128,11 +131,8 @@ public class MPManager implements ILightBox {
     /**
      * Retrieves the preCheckout data from the MasterPass service
      */
-    void preCheckoutDataCallback(final FutureCallback callback) {
-        //PreCheckoutData data
-        if (!isAppPaired())
-            throw new NotPairedException();
-
+    private void preCheckoutData(final FutureCallback callback) {
+        checkoutPaired();
         String url = delegate.getServerAddress() + "/masterpass/precheckout";
         JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
@@ -157,7 +157,7 @@ public class MPManager implements ILightBox {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("Error Pairing Request: ", error.toString());
+                        Log.e("Error PreCheckout Data: ", error.toString());
                         callback.onFailure(error);
                     }
                 }
@@ -165,20 +165,72 @@ public class MPManager implements ILightBox {
         MPLibraryApplication.getInstance().getRequestQueue().add(response);
     }
 
-    void returnCheckoutForOrder(Order order, ViewController viewController) {
+    private void checkoutPaired() {
+        if (!isAppPaired())
+            throw new NotPairedException();
+    }
+
+    private void requestReturnCheckoutForOrder(Order order, final FutureCallback callback) {
+        checkoutPaired();
+        String url = delegate.getServerAddress() + "/masterpass/return_checkout";
+
+        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                String responseString = response.toString();
+                Log.d("Approved Return Checkout Request: ", responseString);
+                CheckoutDetails checkoutDetails = new Gson().fromJson(responseString, CheckoutDetails.class);
+                if (checkoutDetails.hasError()) {
+                    callback.onFailure(new CheckoutException(checkoutDetails.errors));
+                } else {
+                    callback.onSuccess(checkoutDetails);
+                }
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error Return Checkout Request: ", error.toString());
+                callback.onFailure(error);
+            }
+        };
+        MPLibraryApplication.getInstance().getRequestQueue().add(new ReturnCheckoutRequest(url, order, listener, errorListener));
+    }
+
+    private void returnCheckoutForOrder(final Order order, final ViewController viewController) {
+        FutureCallback<CheckoutDetails> callback = new FutureCallback<CheckoutDetails>() {
+            @Override
+            public void onSuccess(CheckoutDetails checkoutDetails) {
+                LightBoxParams options = new LightBoxParams();
+                options.setRequestedDataTypes(null);
+                options.setPairingDetails(null);
+                options.setRequestPairing(null);
+                options.setCheckoutDetails(checkoutDetails);
+                options.setOrder(order);
+                options.setVersion(MP_VERSION);
+                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                delegate.pairingDidComplete(false, error);
+            }
+        };
+        requestReturnCheckoutForOrder(order, callback);
     }
 
     //Pair Checkout
 
-    void pairCheckoutForOrder(String orderNumber, ViewController viewController) {
+    private void pairCheckoutForOrder(String orderNumber, ViewController viewController) {
     }
 
-    void completePairCheckoutForOrder(String orderNumber, String transactionId, String preCheckoutTransactionId) {
+    private void completePairCheckoutForOrder(String orderNumber, String transactionId, String preCheckoutTransactionId) {
     }
 
     //Manual Checkout
 
-    void completeManualCheckoutForOrder(String orderNumber) {
+    private void completeManualCheckoutForOrder(String orderNumber) {
 
     }
 

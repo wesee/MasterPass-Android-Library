@@ -4,12 +4,15 @@ import java.util.List;
 
 /**
  * Created by diego.rotondale on 1/19/2015.
+ * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class LightBoxParams {
     private List<Object> requestedDataTypes;
     private PairingDetails pairingDetails;
-    private int requestPairing;
+    private Integer requestPairing;
     private String version;
+    private CheckoutDetails checkoutDetails;
+    private Order order;
 
     public List<Object> getRequestedDataTypes() {
         return requestedDataTypes;
@@ -27,11 +30,11 @@ public class LightBoxParams {
         this.pairingDetails = pairingDetails;
     }
 
-    public int getRequestPairing() {
+    public Integer getRequestPairing() {
         return requestPairing;
     }
 
-    public void setRequestPairing(int requestPairing) {
+    public void setRequestPairing(Integer requestPairing) {
         this.requestPairing = requestPairing;
     }
 
@@ -41,5 +44,21 @@ public class LightBoxParams {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public CheckoutDetails getCheckoutDetails() {
+        return checkoutDetails;
+    }
+
+    public void setCheckoutDetails(CheckoutDetails checkoutDetails) {
+        this.checkoutDetails = checkoutDetails;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }
