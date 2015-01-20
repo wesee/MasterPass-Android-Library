@@ -9,6 +9,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
 import com.anypresence.masterpass_android_library.dto.PairingDetails;
+import com.anypresence.masterpass_android_library.dto.PreCheckoutData;
+import com.anypresence.masterpass_android_library.exception.BadRequestException;
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
@@ -33,9 +35,6 @@ public class MPManager implements ILightBox {
     public static String CARD_TYPE_VISA = "visa";
     public static String CARD_TYPE_MAESTRO = "maestro";
     public static String MP_VERSION = "v6";
-    public static String MP_ERROR_DOMAIN = "MasterPassErrorDomain";
-    public static String MP_ERROR_NOT_PAIRED = "No long access token found associated with user (user not paired with Masterpass)";
-    public static Integer MPErrorCodeBadRequest = 400;
     private static MPManager instance;
     private IManager delegate;
 
@@ -129,12 +128,41 @@ public class MPManager implements ILightBox {
     /**
      * Retrieves the preCheckout data from the MasterPass service
      */
-    void preCheckoutDataCallback(FutureCallback callback) {
+    void preCheckoutDataCallback(final FutureCallback callback) {
         //PreCheckoutData data
         if (!isAppPaired())
             throw new NotPairedException();
 
         String url = delegate.getServerAddress() + "/masterpass/precheckout";
+        JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        String responseString = response.toString();
+                        Log.d("Received PreCheckout Data: ", responseString);
+                        PreCheckoutData preCheckoutData = new Gson().fromJson(responseString, PreCheckoutData.class);
+                        if (preCheckoutData.hasError()) {
+                            if (preCheckoutData.isNotPaired()) {
+                                // User is not paired. They may have disconnected
+                                // via the MasterPass console.
+                                // We will optionally reset that pairing status here
+                                delegate.resetUserPairing();
+                                callback.onFailure(new BadRequestException(preCheckoutData.errors));
+                            }
+                        } else {
+                            callback.onSuccess(preCheckoutData);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error Pairing Request: ", error.toString());
+                        callback.onFailure(error);
+                    }
+                }
+        );
+        MPLibraryApplication.getInstance().getRequestQueue().add(response);
     }
 
     void returnCheckoutForOrder(Order order, ViewController viewController) {

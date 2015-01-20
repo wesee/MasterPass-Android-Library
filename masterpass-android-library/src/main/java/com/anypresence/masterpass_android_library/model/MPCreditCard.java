@@ -1,8 +1,6 @@
 package com.anypresence.masterpass_android_library.model;
 
-import com.anypresence.masterpass_android_library.util.ConvertUtil;
-
-import java.util.Map;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by diego.rotondale on 1/16/2015.
@@ -10,40 +8,32 @@ import java.util.Map;
  */
 public class MPCreditCard {
 
-    public static String BRAND_ID_KEY = "brand_id";
-    public static String BRAND_NAME_KEY = "brand_name";
-    public static String CARD_ALIAS_KEY = "card_alias";
-    public static String CARD_HOLDER_NAME_KEY = "card_holder_name";
-    public static String CARD_ID_KEY = "card_id";
-    public static String EXPIRY_MONTH_KEY = "expiry_month";
-    public static String EXPIRY_YEAR_KEY = "expiry_year";
-    public static String LAST_FOUR_KEY = "last_four";
-    public static String SELECTED_AS_DEFAULT_KEY = "selected_as_default";
+    public static final String BRAND_ID_KEY = "brand_id";
+    public static final String BRAND_NAME_KEY = "brand_name";
+    public static final String CARD_ALIAS_KEY = "card_alias";
+    public static final String CARD_HOLDER_NAME_KEY = "card_holder_name";
+    public static final String CARD_ID_KEY = "card_id";
+    public static final String EXPIRY_MONTH_KEY = "expiry_month";
+    public static final String EXPIRY_YEAR_KEY = "expiry_year";
+    public static final String LAST_FOUR_KEY = "last_four";
+    public static final String SELECTED_AS_DEFAULT_KEY = "selected_as_default";
 
+    @SerializedName(BRAND_ID_KEY)
     String brandId;
+    @SerializedName(BRAND_NAME_KEY)
     String brandName;
+    @SerializedName(CARD_ALIAS_KEY)
     String cardAlias;
+    @SerializedName(CARD_HOLDER_NAME_KEY)
     String cardHolderName;
+    @SerializedName(CARD_ID_KEY)
     Integer cardId;
+    @SerializedName(EXPIRY_MONTH_KEY)
     String expiryMonth;
+    @SerializedName(EXPIRY_YEAR_KEY)
     String expiryYear;
+    @SerializedName(LAST_FOUR_KEY)
     String lastFour;
+    @SerializedName(SELECTED_AS_DEFAULT_KEY)
     Integer selectedAsDefault;
-
-    public static MPCreditCard getMPAddress(Map<String, Object> dictionary) {
-        MPCreditCard mpCreditCard = new MPCreditCard();
-        if (dictionary == null)
-            return mpCreditCard;
-        mpCreditCard.cardId = ConvertUtil.getInteger(dictionary, CARD_ID_KEY);
-        mpCreditCard.selectedAsDefault = ConvertUtil.getInteger(dictionary, SELECTED_AS_DEFAULT_KEY);
-
-        mpCreditCard.brandId = ConvertUtil.getString(dictionary, BRAND_ID_KEY);
-        mpCreditCard.brandName = ConvertUtil.getString(dictionary, BRAND_NAME_KEY);
-        mpCreditCard.cardAlias = ConvertUtil.getString(dictionary, CARD_ALIAS_KEY);
-        mpCreditCard.cardHolderName = ConvertUtil.getString(dictionary, CARD_HOLDER_NAME_KEY);
-        mpCreditCard.expiryMonth = ConvertUtil.getString(dictionary, EXPIRY_MONTH_KEY);
-        mpCreditCard.expiryYear = ConvertUtil.getString(dictionary, EXPIRY_YEAR_KEY);
-        mpCreditCard.lastFour = ConvertUtil.getString(dictionary, LAST_FOUR_KEY);
-        return mpCreditCard;
-    }
 }
