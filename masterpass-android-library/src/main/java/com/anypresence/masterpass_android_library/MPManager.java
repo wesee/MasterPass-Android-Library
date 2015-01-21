@@ -7,17 +7,21 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.anypresence.masterpass_android_library.dto.CheckoutDetails;
+import com.anypresence.masterpass_android_library.dto.JsonStatus;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
 import com.anypresence.masterpass_android_library.dto.PairingDetails;
 import com.anypresence.masterpass_android_library.dto.PreCheckoutData;
 import com.anypresence.masterpass_android_library.exception.BadRequestException;
 import com.anypresence.masterpass_android_library.exception.CheckoutException;
+import com.anypresence.masterpass_android_library.exception.ManualCheckoutException;
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
+import com.anypresence.masterpass_android_library.exception.PairCheckoutException;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
-import com.anypresence.masterpass_android_library.volleyRequest.ReturnCheckoutRequest;
+import com.anypresence.masterpass_android_library.volleyRequest.CompleteOrderRequest;
+import com.anypresence.masterpass_android_library.volleyRequest.OrderRequest;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -37,8 +41,10 @@ public class MPManager implements ILightBox {
     public static String CARD_TYPE_DISCOVER = "discover";
     public static String CARD_TYPE_VISA = "visa";
     public static String CARD_TYPE_MAESTRO = "maestro";
+
     public static String MP_VERSION = "v6";
     private static MPManager instance;
+
     private IManager delegate;
 
     //Init
@@ -55,6 +61,9 @@ public class MPManager implements ILightBox {
         return instance;
     }
 
+    public void setDelegate(IManager delegate) {
+        this.delegate = delegate;
+    }
     //Pairing
 
     /**
@@ -195,7 +204,7 @@ public class MPManager implements ILightBox {
                 callback.onFailure(error);
             }
         };
-        MPLibraryApplication.getInstance().getRequestQueue().add(new ReturnCheckoutRequest(url, order, listener, errorListener));
+        MPLibraryApplication.getInstance().getRequestQueue().add(new OrderRequest(url, order, listener, errorListener));
     }
 
     private void returnCheckoutForOrder(final Order order, final ViewController viewController) {
@@ -207,7 +216,6 @@ public class MPManager implements ILightBox {
                 options.setPairingDetails(null);
                 options.setRequestPairing(null);
                 options.setCheckoutDetails(checkoutDetails);
-                options.setOrder(order);
                 options.setVersion(MP_VERSION);
                 showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
             }
@@ -222,16 +230,106 @@ public class MPManager implements ILightBox {
 
     //Pair Checkout
 
-    private void pairCheckoutForOrder(String orderNumber, ViewController viewController) {
+    private void pairCheckoutForOrder(Order order, final ViewController viewController) {
+        FutureCallback<PairingDetails> callback = new FutureCallback<PairingDetails>() {
+            @Override
+            public void onSuccess(PairingDetails pairingDetails) {
+                LightBoxParams options = new LightBoxParams();
+                options.setRequestedDataTypes(delegate.getSupportedDataTypes());
+                options.setPairingDetails(pairingDetails);
+                options.setAllowedCardType(delegate.getSupportedCardTypes());
+                options.setRequestPairing(1);
+                options.setVersion(MP_VERSION);
+                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                delegate.pairingDidComplete(false, error);
+            }
+        };
+        requestPairCheckoutForOrder(order, callback);
     }
 
-    private void completePairCheckoutForOrder(String orderNumber, String transactionId, String preCheckoutTransactionId) {
+    private void requestPairCheckoutForOrder(Order order, final FutureCallback callback) {
+        String url = delegate.getServerAddress() + "/masterpass/pair_and_checkout";
+
+        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                String responseString = response.toString();
+                Log.d("Approved Pair Checkout Request: ", responseString);
+                PairingDetails pairingDetails = new Gson().fromJson(responseString, PairingDetails.class);
+                if (pairingDetails.hasError()) {
+                    callback.onFailure(new CheckoutException(pairingDetails.errors));
+                } else {
+                    callback.onSuccess(pairingDetails);
+                }
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error Return Checkout Request: ", error.toString());
+                callback.onFailure(error);
+            }
+        };
+        MPLibraryApplication.getInstance().getRequestQueue().add(new OrderRequest(url, order, listener, errorListener));
+    }
+
+    private void completePairCheckoutForOrder(Order order) {
+        String url = delegate.getServerAddress() + "/masterpass/complete_checkout";
+
+        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                String responseString = response.toString();
+                Log.d("Completed Checkout Successfully: ", responseString);
+                JsonStatus jsonStatus = new Gson().fromJson(responseString, JsonStatus.class);
+                if (jsonStatus.hasError()) {
+                    delegate.pairCheckoutDidComplete(false, new PairCheckoutException(jsonStatus.errors));
+                } else {
+                    delegate.pairCheckoutDidComplete(true, null);
+                }
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error in Completed Checkout Successfully: ", error.toString());
+            }
+        };
+        MPLibraryApplication.getInstance().getRequestQueue().add(new CompleteOrderRequest(url, order, listener, errorListener));
     }
 
     //Manual Checkout
 
-    private void completeManualCheckoutForOrder(String orderNumber) {
+    private void completeManualCheckout(Order order) {
+        String url = delegate.getServerAddress() + "/masterpass/non_masterpass_checkout";
 
+        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                String responseString = response.toString();
+                Log.d("Completed Manual Checkout Successfully: ", responseString);
+                JsonStatus jsonStatus = new Gson().fromJson(responseString, JsonStatus.class);
+                if (jsonStatus.hasError()) {
+                    delegate.manualCheckoutDidComplete(false, new ManualCheckoutException(jsonStatus.errors));
+                } else {
+                    delegate.manualCheckoutDidComplete(true, null);
+                }
+            }
+        };
+
+        Response.ErrorListener errorListener = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error in Completed Manual Checkout Successfully: ", error.toString());
+            }
+        };
+        MPLibraryApplication.getInstance().getRequestQueue().add(new OrderRequest(url, order, listener, errorListener));
     }
 
     //ILightBox
@@ -246,12 +344,22 @@ public class MPManager implements ILightBox {
     }
 
     @Override
-    public void lightBoxDidCompletePreCheckout(MPLightBox lightBoxViewController, Boolean success, Map<Object, Object> data, Throwable error) {
-
+    public void lightBoxDidCompletePreCheckout(MPLightBox lightBoxViewController, final Boolean success, final Map<Object, Object> data, final Throwable error) {
+        lightBoxViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
+            @Override
+            public void onComplete() {
+                delegate.preCheckoutDidComplete(success, data, error);
+            }
+        });
     }
 
     @Override
-    public void lightBoxDidCompleteCheckout(MPLightBox pairingViewController, Boolean success, Throwable error) {
-
+    public void lightBoxDidCompleteCheckout(MPLightBox pairingViewController, final Boolean success, final Throwable error) {
+        pairingViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
+            @Override
+            public void onComplete() {
+                delegate.checkoutDidComplete(success, error);
+            }
+        });
     }
 }

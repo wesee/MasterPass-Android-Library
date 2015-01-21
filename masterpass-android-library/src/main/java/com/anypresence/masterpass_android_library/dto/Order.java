@@ -12,4 +12,6 @@ public class Order {
     public Wallet walletInfo;
     public MPCreditCard card;
     public MPAddress shippingAddress;
+    public String transactionId;
+    public String preCheckoutTransactionId;
 }

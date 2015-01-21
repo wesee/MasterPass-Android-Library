@@ -13,10 +13,10 @@ import java.util.Map;
  * Created by diego.rotondale on 1/20/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class ReturnCheckoutRequest extends JsonObjectRequest {
+public class OrderRequest extends JsonObjectRequest {
     private Order order;
 
-    public ReturnCheckoutRequest(String url, Order order, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+    public OrderRequest(String url, Order order, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         super(Method.POST, url, null, listener, errorListener);
         this.order = order;
     }

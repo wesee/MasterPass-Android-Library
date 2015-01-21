@@ -62,7 +62,7 @@ public interface IManager {
      * Method that executes when preCheckout completes
      *
      * @param success the status of the checkout
-     * @param data    the preCheckout data
+     * @param data
      * @param error   any errors that occurred during checkout
      */
     void preCheckoutDidComplete(Boolean success, Map<Object, Object> data, Throwable error);

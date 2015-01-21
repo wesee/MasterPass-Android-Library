@@ -12,7 +12,7 @@ public class LightBoxParams {
     private Integer requestPairing;
     private String version;
     private CheckoutDetails checkoutDetails;
-    private Order order;
+    private List<Object> allowedCardType;
 
     public List<Object> getRequestedDataTypes() {
         return requestedDataTypes;
@@ -54,11 +54,11 @@ public class LightBoxParams {
         this.checkoutDetails = checkoutDetails;
     }
 
-    public Order getOrder() {
-        return order;
+    public List<Object> getAllowedCardType() {
+        return allowedCardType;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setAllowedCardType(List<Object> allowedCardType) {
+        this.allowedCardType = allowedCardType;
     }
 }
