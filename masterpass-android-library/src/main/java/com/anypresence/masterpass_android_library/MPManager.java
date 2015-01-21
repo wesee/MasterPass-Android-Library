@@ -375,47 +375,23 @@ public class MPManager implements ILightBox {
         return preCheckoutURL;
     }
 
-    public void setPreCheckoutURL(String preCheckoutURL) {
-        this.preCheckoutURL = preCheckoutURL;
-    }
-
     public String getPairURL() {
         return pairURL;
-    }
-
-    public void setPairURL(String pairURL) {
-        this.pairURL = pairURL;
     }
 
     public String getCheckoutURL() {
         return checkoutURL;
     }
 
-    public void setCheckoutURL(String checkoutURL) {
-        this.checkoutURL = checkoutURL;
-    }
-
     public String getPairAndCheckoutURL() {
         return pairAndCheckoutURL;
-    }
-
-    public void setPairAndCheckoutURL(String pairAndCheckoutURL) {
-        this.pairAndCheckoutURL = pairAndCheckoutURL;
     }
 
     public String getCompletePairCheckout() {
         return completePairCheckout;
     }
 
-    public void setCompletePairCheckout(String completePairCheckout) {
-        this.completePairCheckout = completePairCheckout;
-    }
-
     public String getManualCheckoutURL() {
         return manualCheckoutURL;
-    }
-
-    public void setManualCheckoutURL(String manualCheckoutURL) {
-        this.manualCheckoutURL = manualCheckoutURL;
     }
 }

@@ -20,7 +20,7 @@ public class Wallet {
     String consumerWalletId;
     @SerializedName(WALLET_PARTNER_LOGO_URL_KEY)
     String walletPartnerLogoUrl;
-    @SerializedName(WALLET_PARTNER_LOGO_URL_KEY)
+    @SerializedName(MASTERPASS_LOGO_URL_KEY)
     String masterpassLogoUrl;
 
 }
