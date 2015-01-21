@@ -7,27 +7,26 @@ import java.util.List;
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class LightBoxParams {
-    private List<Object> requestedDataTypes;
-    private PairingDetails pairingDetails;
+    private List<String> requestedDataTypes;
+    private Details details;
     private Integer requestPairing;
     private String version;
-    private CheckoutDetails checkoutDetails;
     private List<Object> allowedCardType;
 
-    public List<Object> getRequestedDataTypes() {
+    public List<String> getRequestedDataTypes() {
         return requestedDataTypes;
     }
 
-    public void setRequestedDataTypes(List<Object> requestedDataTypes) {
+    public void setRequestedDataTypes(List<String> requestedDataTypes) {
         this.requestedDataTypes = requestedDataTypes;
     }
 
-    public PairingDetails getPairingDetails() {
-        return pairingDetails;
+    public Details getDetails() {
+        return details;
     }
 
-    public void setPairingDetails(PairingDetails pairingDetails) {
-        this.pairingDetails = pairingDetails;
+    public void setDetails(Details details) {
+        this.details = details;
     }
 
     public Integer getRequestPairing() {
@@ -44,14 +43,6 @@ public class LightBoxParams {
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public CheckoutDetails getCheckoutDetails() {
-        return checkoutDetails;
-    }
-
-    public void setCheckoutDetails(CheckoutDetails checkoutDetails) {
-        this.checkoutDetails = checkoutDetails;
     }
 
     public List<Object> getAllowedCardType() {

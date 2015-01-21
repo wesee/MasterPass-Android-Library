@@ -1,4 +1,4 @@
-package com.anypresence.masterpass_android_library.model;
+package com.anypresence.masterpass_android_library.dto;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -6,11 +6,12 @@ import com.google.gson.annotations.SerializedName;
  * Created by diego.rotondale on 1/16/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class MPCreditCard {
+public class CreditCard {
 
     public static final String BRAND_ID_KEY = "brand_id";
     public static final String BRAND_NAME_KEY = "brand_name";
     public static final String CARD_ALIAS_KEY = "card_alias";
+    public static final String BILLING_ADDRESS_KEY = "billing_address";
     public static final String CARD_HOLDER_NAME_KEY = "card_holder_name";
     public static final String CARD_ID_KEY = "card_id";
     public static final String EXPIRY_MONTH_KEY = "expiry_month";
@@ -22,6 +23,8 @@ public class MPCreditCard {
     String brandId;
     @SerializedName(BRAND_NAME_KEY)
     String brandName;
+    @SerializedName(BILLING_ADDRESS_KEY)
+    Address billingAddress;
     @SerializedName(CARD_ALIAS_KEY)
     String cardAlias;
     @SerializedName(CARD_HOLDER_NAME_KEY)

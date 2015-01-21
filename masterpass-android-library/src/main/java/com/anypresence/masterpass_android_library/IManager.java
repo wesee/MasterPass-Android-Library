@@ -30,7 +30,7 @@ public interface IManager {
      *
      * @return the supported data types
      */
-    abstract List<Object> getSupportedDataTypes();
+    abstract List<String> getSupportedDataTypes();
 
     /**
      * Returns an array of supported card types (MasterCard, Visa, Discover, etc)

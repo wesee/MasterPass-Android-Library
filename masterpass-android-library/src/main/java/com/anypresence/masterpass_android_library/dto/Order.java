@@ -1,8 +1,5 @@
 package com.anypresence.masterpass_android_library.dto;
 
-import com.anypresence.masterpass_android_library.model.MPAddress;
-import com.anypresence.masterpass_android_library.model.MPCreditCard;
-
 /**
  * Created by diego.rotondale on 1/19/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
@@ -10,8 +7,8 @@ import com.anypresence.masterpass_android_library.model.MPCreditCard;
 public class Order {
     public String orderNumber;
     public Wallet walletInfo;
-    public MPCreditCard card;
-    public MPAddress shippingAddress;
+    public CreditCard card;
+    public Address shippingAddress;
     public String transactionId;
     public String preCheckoutTransactionId;
 }

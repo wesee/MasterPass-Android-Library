@@ -1,4 +1,4 @@
-package com.anypresence.masterpass_android_library.model;
+package com.anypresence.masterpass_android_library.dto;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by diego.rotondale on 1/16/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class MPAddress {
+public class Address {
     public static final String ADDRESS_ID_KEY = "address_id";
     public static final String CITY_KEY = "city";
     public static final String COUNTRY_KEY = "country";
