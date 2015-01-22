@@ -6,6 +6,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.anypresence.masterpass_android_library.activities.MPLightBox;
 import com.anypresence.masterpass_android_library.dto.Details;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
@@ -17,6 +18,8 @@ import com.anypresence.masterpass_android_library.exception.ManualCheckoutExcept
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.exception.PairCheckoutException;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
+import com.anypresence.masterpass_android_library.interfaces.ILightBox;
+import com.anypresence.masterpass_android_library.interfaces.IManager;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
 import com.anypresence.masterpass_android_library.volleyRequest.CompleteOrderRequest;
@@ -134,7 +137,7 @@ public class MPManager implements ILightBox {
 
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
         final MPLightBox mpLightBox = new MPLightBox();
-        mpLightBox.delegate = this;
+        mpLightBox.setDelegate(this);
         viewController.presentViewController(mpLightBox, true, new OnCompleteCallback() {
             @Override
             public void onComplete() {
@@ -231,6 +234,7 @@ public class MPManager implements ILightBox {
                 options.setDetails(details);
                 options.setRequestPairing(null);
                 options.setVersion(MP_VERSION);
+                options.setOrder(order);
                 showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
             }
 
@@ -342,7 +346,7 @@ public class MPManager implements ILightBox {
 
     //ILightBox
     @Override
-    public void pairingViewDidCompletePairing(MPLightBox pairingViewController, final Boolean success, final Throwable error) {
+    public void pairingViewDidCompletePairing(ViewController pairingViewController, final Boolean success, final Throwable error) {
         pairingViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
             @Override
             public void onComplete() {
@@ -352,7 +356,7 @@ public class MPManager implements ILightBox {
     }
 
     @Override
-    public void lightBoxDidCompletePreCheckout(MPLightBox lightBoxViewController, final Boolean success, final Map<Object, Object> data, final Throwable error) {
+    public void lightBoxDidCompletePreCheckout(ViewController lightBoxViewController, final Boolean success, final Map<Object, Object> data, final Throwable error) {
         lightBoxViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
             @Override
             public void onComplete() {
@@ -362,7 +366,7 @@ public class MPManager implements ILightBox {
     }
 
     @Override
-    public void lightBoxDidCompleteCheckout(MPLightBox pairingViewController, final Boolean success, final Throwable error) {
+    public void lightBoxDidCompleteCheckout(ViewController pairingViewController, final Boolean success, final Throwable error) {
         pairingViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
             @Override
             public void onComplete() {

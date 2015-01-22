@@ -1,5 +1,10 @@
 package com.anypresence.masterpass_android_library.dto;
 
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -7,49 +12,66 @@ import java.util.List;
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class LightBoxParams {
-    private List<String> requestedDataTypes;
     private Details details;
-    private Integer requestPairing;
     private String version;
+    private List<String> requestedDataTypes;
+    private Integer requestPairing;
     private List<Object> allowedCardType;
-
-    public List<String> getRequestedDataTypes() {
-        return requestedDataTypes;
-    }
+    private Order order;
 
     public void setRequestedDataTypes(List<String> requestedDataTypes) {
         this.requestedDataTypes = requestedDataTypes;
-    }
-
-    public Details getDetails() {
-        return details;
     }
 
     public void setDetails(Details details) {
         this.details = details;
     }
 
-    public Integer getRequestPairing() {
-        return requestPairing;
-    }
-
     public void setRequestPairing(Integer requestPairing) {
         this.requestPairing = requestPairing;
-    }
-
-    public String getVersion() {
-        return version;
     }
 
     public void setVersion(String version) {
         this.version = version;
     }
 
-    public List<Object> getAllowedCardType() {
-        return allowedCardType;
-    }
-
     public void setAllowedCardType(List<Object> allowedCardType) {
         this.allowedCardType = allowedCardType;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public String toJson() {
+        JSONObject json = new JSONObject();
+        try {
+            if (details.checkoutRequestToken != null)
+                json.put("requestToken", details.checkoutRequestToken);
+            if (details.merchantCheckoutId != null)
+                json.put("merchantCheckoutId", details.merchantCheckoutId);
+            if (details.callbackUrl != null)
+                json.put("callbackUrl", details.callbackUrl);
+            if (version != null)
+                json.put("version", version);
+            if (order != null) {
+                if (order.card != null)
+                    json.put("cardId", order.card.cardId);
+                if (order.shippingAddress != null)
+                    json.put("shippingId", order.shippingAddress.addressId);
+                if (order.walletInfo != null) {
+                    json.put("precheckoutTransactionId", order.walletInfo.preCheckoutTransactionId);
+                    json.put("walletName", order.walletInfo.walletName);
+                    json.put("consumerWalletId", order.walletInfo.consumerWalletId);
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(LightBoxParams.class.getSimpleName(), e.getMessage());
+        }
+        return json.toString();
+    }
+
+    public String getCallbackURL() {
+        return details.callbackUrl.replace("\\", "");
     }
 }

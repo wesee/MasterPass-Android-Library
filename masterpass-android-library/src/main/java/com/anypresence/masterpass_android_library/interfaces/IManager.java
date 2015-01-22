@@ -1,4 +1,4 @@
-package com.anypresence.masterpass_android_library;
+package com.anypresence.masterpass_android_library.interfaces;
 
 import java.util.List;
 import java.util.Map;
