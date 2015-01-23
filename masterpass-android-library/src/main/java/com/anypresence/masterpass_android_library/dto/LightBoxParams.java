@@ -16,7 +16,7 @@ public class LightBoxParams {
     private String version;
     private List<String> requestedDataTypes;
     private Integer requestPairing;
-    private List<Object> allowedCardType;
+    private List<String> allowedCardType;
     private Order order;
 
     public void setRequestedDataTypes(List<String> requestedDataTypes) {
@@ -35,7 +35,7 @@ public class LightBoxParams {
         this.version = version;
     }
 
-    public void setAllowedCardType(List<Object> allowedCardType) {
+    public void setAllowedCardType(List<String> allowedCardType) {
         this.allowedCardType = allowedCardType;
     }
 

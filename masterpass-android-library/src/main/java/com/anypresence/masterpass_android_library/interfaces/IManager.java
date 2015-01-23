@@ -38,7 +38,7 @@ public interface IManager {
      *
      * @return the supported card types
      */
-    abstract List<Object> getSupportedCardTypes();
+    abstract List<String> getSupportedCardTypes();
 
     //OPTIONAL
 
