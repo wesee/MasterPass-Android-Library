@@ -3,9 +3,11 @@ package com.anypresence.masterpass_android_library;
 import android.util.Log;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.anypresence.masterpass_android_library.activities.MPLightBox;
 import com.anypresence.masterpass_android_library.dto.Details;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
@@ -111,10 +113,10 @@ public class MPManager implements ILightBox {
                 delegate.pairingDidComplete(false, throwable);
             }
         };
-        this.requestPairing(futureCallback);
+        this.requestPairing(viewController, futureCallback);
     }
 
-    protected void requestPairing(final FutureCallback<Details> callback) {
+    protected void requestPairing(ViewController viewController, final FutureCallback<Details> callback) {
         JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, getPairURL(), null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -132,7 +134,7 @@ public class MPManager implements ILightBox {
                     }
                 }
         );
-        MPLibraryApplication.getInstance().getRequestQueue().add(response);
+        getRequestQueue(viewController).add(response);
     }
 
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
@@ -161,7 +163,7 @@ public class MPManager implements ILightBox {
     /**
      * Retrieves the preCheckout data from the MasterPass service
      */
-    private void preCheckoutData(final FutureCallback callback) {
+    private void preCheckoutData(ViewController viewController, final FutureCallback callback) {
         checkoutPaired();
         JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, getPreCheckoutURL(), null,
                 new Response.Listener<JSONObject>() {
@@ -191,7 +193,7 @@ public class MPManager implements ILightBox {
                     }
                 }
         );
-        MPLibraryApplication.getInstance().getRequestQueue().add(response);
+        getRequestQueue(viewController).add(response);
     }
 
     private void checkoutPaired() {
@@ -199,7 +201,7 @@ public class MPManager implements ILightBox {
             throw new NotPairedException();
     }
 
-    private void requestReturnCheckoutForOrder(Order order, final FutureCallback callback) {
+    private void requestReturnCheckoutForOrder(Order order, ViewController viewController, final FutureCallback callback) {
         checkoutPaired();
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
@@ -222,7 +224,7 @@ public class MPManager implements ILightBox {
                 callback.onFailure(error);
             }
         };
-        MPLibraryApplication.getInstance().getRequestQueue().add(new OrderRequest(getCheckoutURL(), order, listener, errorListener));
+        getRequestQueue(viewController).add(new OrderRequest(getCheckoutURL(), order, listener, errorListener));
     }
 
     private void returnCheckoutForOrder(final Order order, final ViewController viewController) {
@@ -243,7 +245,7 @@ public class MPManager implements ILightBox {
                 delegate.pairingDidComplete(false, error);
             }
         };
-        requestReturnCheckoutForOrder(order, callback);
+        requestReturnCheckoutForOrder(order, viewController, callback);
     }
 
     //Pair Checkout
@@ -266,10 +268,10 @@ public class MPManager implements ILightBox {
                 delegate.pairingDidComplete(false, error);
             }
         };
-        requestPairCheckoutForOrder(order, callback);
+        requestPairCheckoutForOrder(order, viewController, callback);
     }
 
-    private void requestPairCheckoutForOrder(Order order, final FutureCallback callback) {
+    private void requestPairCheckoutForOrder(Order order, ViewController viewController, final FutureCallback callback) {
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -291,10 +293,10 @@ public class MPManager implements ILightBox {
                 callback.onFailure(error);
             }
         };
-        MPLibraryApplication.getInstance().getRequestQueue().add(new OrderRequest(getPairAndCheckoutURL(), order, listener, errorListener));
+        getRequestQueue(viewController).add(new OrderRequest(getPairAndCheckoutURL(), order, listener, errorListener));
     }
 
-    private void completePairCheckoutForOrder(Order order) {
+    private void completePairCheckoutForOrder(Order order, ViewController viewController) {
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -315,12 +317,12 @@ public class MPManager implements ILightBox {
                 Log.e("Error in Completed Checkout Successfully: ", error.toString());
             }
         };
-        MPLibraryApplication.getInstance().getRequestQueue().add(new CompleteOrderRequest(getCompletePairCheckout(), order, listener, errorListener));
+        getRequestQueue(viewController).add(new CompleteOrderRequest(getCompletePairCheckout(), order, listener, errorListener));
     }
 
     //Manual Checkout
 
-    private void completeManualCheckout(Order order) {
+    private void completeManualCheckout(Order order, ViewController viewController) {
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -341,7 +343,7 @@ public class MPManager implements ILightBox {
                 Log.e("Error in Completed Manual Checkout Successfully: ", error.toString());
             }
         };
-        MPLibraryApplication.getInstance().getRequestQueue().add(new OrderRequest(getManualCheckoutURL(), order, listener, errorListener));
+        getRequestQueue(viewController).add(new OrderRequest(getManualCheckoutURL(), order, listener, errorListener));
     }
 
     //ILightBox
@@ -397,5 +399,9 @@ public class MPManager implements ILightBox {
 
     public String getManualCheckoutURL() {
         return manualCheckoutURL;
+    }
+
+    public RequestQueue getRequestQueue(ViewController viewController) {
+        return Volley.newRequestQueue(viewController.getContext());
     }
 }

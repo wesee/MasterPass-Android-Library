@@ -1,6 +1,7 @@
 package com.anypresence.masterpass_android_library.interfaces;
 
 import android.app.Activity;
+import android.content.Context;
 
 /**
  * Created by diego.rotondale on 1/19/2015.
@@ -10,4 +11,6 @@ public interface ViewController {
     void presentViewController(Activity activity, Boolean animated, OnCompleteCallback callback);
 
     void dismissViewControllerAnimated(boolean animated, OnCompleteCallback callback);
+
+    Context getContext();
 }

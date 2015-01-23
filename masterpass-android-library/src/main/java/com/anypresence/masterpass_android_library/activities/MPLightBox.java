@@ -2,16 +2,18 @@ package com.anypresence.masterpass_android_library.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.anypresence.masterpass_android_library.MPLibraryApplication;
+import com.android.volley.toolbox.Volley;
 import com.anypresence.masterpass_android_library.MPManager;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
@@ -69,6 +71,11 @@ public class MPLightBox extends Activity implements ViewController {
     public void dismissViewControllerAnimated(boolean animate, OnCompleteCallback onCompleteCallback) {
     }
 
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
     public void checkIfLoadDone(WebView webView) {
         if (progressDialog != null)
             progressDialog.dismiss();
@@ -91,6 +98,10 @@ public class MPLightBox extends Activity implements ViewController {
             return String.valueOf(JSType);
         }
         return null;
+    }
+
+    private RequestQueue getRequestQueue() {
+        return Volley.newRequestQueue(this);
     }
 
     public enum MPLightBoxType {
@@ -139,7 +150,7 @@ public class MPLightBox extends Activity implements ViewController {
                                 }
                             }
                     );
-                    MPLibraryApplication.getInstance().getRequestQueue().add(response);
+                    getRequestQueue().add(response);
                 }
             } catch (URISyntaxException e) {
                 Log.e(MPLightBox.class.getSimpleName(), e.getMessage());
