@@ -14,6 +14,7 @@ import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
 import com.anypresence.masterpass_android_library.dto.PreCheckoutResponse;
 import com.anypresence.masterpass_android_library.dto.StatusWithError;
+import com.anypresence.masterpass_android_library.dto.WebViewOptions;
 import com.anypresence.masterpass_android_library.exception.BadRequestException;
 import com.anypresence.masterpass_android_library.exception.CheckoutException;
 import com.anypresence.masterpass_android_library.exception.ManualCheckoutException;
@@ -117,7 +118,7 @@ public class MPManager implements ILightBox {
     }
 
     protected void requestPairing(ViewController viewController, final FutureCallback<Details> callback) {
-        JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, getPairURL(), null,
+        JsonObjectRequest response = new JsonObjectRequest(Request.Method.POST, getPairURL(), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -140,12 +141,7 @@ public class MPManager implements ILightBox {
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
         final MPLightBox mpLightBox = new MPLightBox();
         mpLightBox.setDelegate(this);
-        viewController.presentViewController(mpLightBox, true, new OnCompleteCallback() {
-            @Override
-            public void onComplete() {
-                mpLightBox.initiateLightBoxOfTypeWithOptions(type, options);
-            }
-        });
+        viewController.presentViewController(mpLightBox, true, new WebViewOptions(type, options));
     }
 
     /**

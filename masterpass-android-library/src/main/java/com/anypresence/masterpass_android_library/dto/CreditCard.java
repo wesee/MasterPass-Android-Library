@@ -2,11 +2,13 @@ package com.anypresence.masterpass_android_library.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by diego.rotondale on 1/16/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class CreditCard {
+public class CreditCard implements Serializable {
 
     public static final String BRAND_ID_KEY = "brand_id";
     public static final String BRAND_NAME_KEY = "brand_name";

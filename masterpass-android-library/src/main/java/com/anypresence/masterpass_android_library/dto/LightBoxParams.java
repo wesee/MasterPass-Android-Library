@@ -5,13 +5,14 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by diego.rotondale on 1/19/2015.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class LightBoxParams {
+public class LightBoxParams implements Serializable {
     private Details details;
     private String version;
     private List<String> requestedDataTypes;

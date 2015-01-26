@@ -14,10 +14,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.anypresence.masterpass_android_library.Constants;
 import com.anypresence.masterpass_android_library.MPManager;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Status;
+import com.anypresence.masterpass_android_library.dto.WebViewOptions;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
 import com.google.gson.Gson;
@@ -53,6 +55,11 @@ public class MPLightBox extends Activity implements ViewController {
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            WebViewOptions options = (WebViewOptions) extras.getSerializable(Constants.OPTIONS_PARAMETER);
+            initiateLightBoxOfTypeWithOptions(options.type, options.options);
+        }
     }
 
     public void initiateLightBoxOfTypeWithOptions(MPLightBoxType type, LightBoxParams options) {
@@ -64,7 +71,7 @@ public class MPLightBox extends Activity implements ViewController {
     }
 
     @Override
-    public void presentViewController(Activity activity, Boolean animated, OnCompleteCallback callback) {
+    public void presentViewController(Activity activity, Boolean animated, WebViewOptions options) {
     }
 
     @Override
@@ -161,7 +168,7 @@ public class MPLightBox extends Activity implements ViewController {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            //checkIfLoadDone(webView);
+            checkIfLoadDone(webView);
         }
     }
 }

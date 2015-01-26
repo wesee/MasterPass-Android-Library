@@ -2,10 +2,12 @@ package com.anypresence.masterpass_android_library.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by diego.rotondale on 1/20/2015.
  */
-public class Wallet {
+public class Wallet implements Serializable {
     public static final String WALLET_NAME = "wallet_name";
     public static final String PRE_CHECKOUT_TRANSACTION_ID_KEY = "precheckout_transaction_id";
     public static final String CONSUMER_WALLET_ID_KEY = "consumer_wallet_id";
