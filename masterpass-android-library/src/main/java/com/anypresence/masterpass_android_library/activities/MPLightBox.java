@@ -41,6 +41,7 @@ public class MPLightBox extends Activity implements ViewController {
     private WebView web;
     private ProgressDialog progressDialog;
     private MPManager delegate;
+    private boolean wasLoad = false;
 
     public void setDelegate(MPManager delegate) {
         this.delegate = delegate;
@@ -91,8 +92,9 @@ public class MPLightBox extends Activity implements ViewController {
 
     private String getJs() {
         String value = null;
-        if (type != null && options != null) {
-            value = "initiateLightbox(" + getType() + ", " + options.toJson() + ");";
+        if (!wasLoad && type != null && options != null) {
+            value = "javascript:initiateLightbox(" + getType() + ", " + options.toJson() + ");";
+            wasLoad = true;
         }
         return value;
     }
@@ -168,7 +170,8 @@ public class MPLightBox extends Activity implements ViewController {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            checkIfLoadDone(webView);
+            if (url.equals(URL))
+                checkIfLoadDone(webView);
         }
     }
 }
