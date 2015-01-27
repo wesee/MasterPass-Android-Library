@@ -34,14 +34,13 @@ import java.net.URISyntaxException;
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class MPLightBox extends Activity implements ViewController {
-
+    private static final String LOG_TAG = MPLightBox.class.getSimpleName();
     private static final String URL = "file:///android_asset/mp_lightbox_base.html";
     private MPLightBoxType type;
     private LightBoxParams options;
     private WebView web;
     private ProgressDialog progressDialog;
     private MPManager delegate;
-    private boolean wasLoad = false;
 
     public void setDelegate(MPManager delegate) {
         this.delegate = delegate;
@@ -92,9 +91,8 @@ public class MPLightBox extends Activity implements ViewController {
 
     private String getJs() {
         String value = null;
-        if (!wasLoad && type != null && options != null) {
+        if (type != null && options != null) {
             value = "javascript:initiateLightbox(" + getType() + ", " + options.toJson() + ");";
-            wasLoad = true;
         }
         return value;
     }
@@ -155,14 +153,16 @@ public class MPLightBox extends Activity implements ViewController {
                             new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-                                    Log.e(MPLightBox.class.getSimpleName(), error.getMessage());
+                                    Log.e(LOG_TAG, error.toString());
                                 }
                             }
                     );
                     getRequestQueue().add(response);
+                } else {
+                    web.loadUrl(url);
                 }
             } catch (URISyntaxException e) {
-                Log.e(MPLightBox.class.getSimpleName(), e.getMessage());
+                Log.e(LOG_TAG, e.getMessage());
             } finally {
                 return true;
             }
