@@ -129,6 +129,8 @@ public class MPLightBox extends Activity implements ViewController {
             try {
                 URI uri = new URI(url);
                 String urlConverted = uri.getScheme() + "://" + uri.getHost() + uri.getPath();
+                Log.d("urlConverted: ", urlConverted);
+                Log.d("getCallbackURL: ", options.getCallbackURL());
                 if (urlConverted.equals(options.getCallbackURL())) {
                     JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, urlConverted, null,
                             new Response.Listener<JSONObject>() {
@@ -170,6 +172,7 @@ public class MPLightBox extends Activity implements ViewController {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
+            Log.d(LOG_TAG, url);
             if (url.equals(URL))
                 checkIfLoadDone(webView);
         }
