@@ -162,6 +162,7 @@ public class MPLightBox extends Activity implements ViewController {
                     getRequestQueue().add(response);
                 } else {
                     web.loadUrl(url);
+                    return false;
                 }
             } catch (URISyntaxException e) {
                 Log.e(LOG_TAG, e.getMessage());
