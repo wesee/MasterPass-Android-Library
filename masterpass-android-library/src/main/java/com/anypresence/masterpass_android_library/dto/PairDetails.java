@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by diego.rotondale on 1/21/2015.
+ * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class PairDetails extends StatusWithError {
     public static final String PAIRING_REQUEST_TOKEN_KEY = "pairing_request_token";

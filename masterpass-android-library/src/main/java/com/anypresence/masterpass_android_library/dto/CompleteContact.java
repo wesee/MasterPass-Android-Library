@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by diego.rotondale on 1/21/2015.
+ * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class CompleteContact extends Contact {
     public static final String SHIPPING_ADDRESS_KEY = "shipping_address";
