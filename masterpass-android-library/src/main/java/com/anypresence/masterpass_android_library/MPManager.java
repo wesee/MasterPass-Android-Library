@@ -16,7 +16,6 @@ import com.anypresence.masterpass_android_library.dto.PreCheckoutResponse;
 import com.anypresence.masterpass_android_library.dto.StatusWithError;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
 import com.anypresence.masterpass_android_library.exception.BadRequestException;
-import com.anypresence.masterpass_android_library.exception.CheckoutException;
 import com.anypresence.masterpass_android_library.exception.ManualCheckoutException;
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.exception.PairCheckoutException;
@@ -157,7 +156,7 @@ public class MPManager implements ILightBox {
     /**
      * Retrieves the preCheckout data from the MasterPass service
      */
-    private void preCheckoutData(ViewController viewController, final FutureCallback callback) {
+    public void preCheckout(ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
         checkoutPaired();
         JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, getPreCheckoutURL(), null,
                 new Response.Listener<JSONObject>() {
@@ -203,11 +202,12 @@ public class MPManager implements ILightBox {
                 String responseString = response.toString();
                 Log.d("Approved Return Checkout Request: ", responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
-                if (details.hasError()) {
-                    callback.onFailure(new CheckoutException(details.errors));
-                } else {
-                    callback.onSuccess(details);
-                }
+                //TODO:Check with David
+                //if (details.hasError()) {
+                //callback.onFailure(new CheckoutException(details.errors));
+                //} else {
+                callback.onSuccess(details);
+                //}
             }
         };
 
@@ -244,7 +244,7 @@ public class MPManager implements ILightBox {
 
     //Pair Checkout
 
-    private void pairCheckoutForOrder(Order order, final ViewController viewController) {
+    public void pairCheckoutForOrder(Order order, final ViewController viewController) {
         FutureCallback<Details> callback = new FutureCallback<Details>() {
             @Override
             public void onSuccess(Details details) {
@@ -272,11 +272,12 @@ public class MPManager implements ILightBox {
                 String responseString = response.toString();
                 Log.d("Approved Pair Checkout Request: ", responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
-                if (details.hasError()) {
-                    callback.onFailure(new CheckoutException(details.errors));
-                } else {
-                    callback.onSuccess(details);
-                }
+                //TODO:Check with David
+                //if (details.hasError()) {
+                //  callback.onFailure(new CheckoutException(details.errors));
+                //} else {
+                callback.onSuccess(details);
+                //}
             }
         };
 
