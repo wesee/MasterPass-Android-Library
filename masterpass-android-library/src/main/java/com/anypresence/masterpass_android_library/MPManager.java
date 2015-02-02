@@ -26,8 +26,11 @@ import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +38,8 @@ import java.util.Map;
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class MPManager implements ILightBox {
+    private static final String LOG_TAG = MPManager.class.getSimpleName();
+
     public static String DATA_TYPE_CARD = "CARD";
     public static String DATA_TYPE_ADDRESS = "ADDRESS";
     public static String DATA_TYPE_PROFILE = "PROFILE";
@@ -158,7 +163,7 @@ public class MPManager implements ILightBox {
      */
     public void preCheckout(ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
         checkoutPaired();
-        JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, getPreCheckoutURL(), null,
+        JsonObjectRequest response = new JsonObjectRequest(Request.Method.POST, getPreCheckoutURL(), getPreCheckoutParams(),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -187,6 +192,21 @@ public class MPManager implements ILightBox {
                 }
         );
         getRequestQueue(viewController).add(response);
+    }
+
+    public JSONObject getPreCheckoutParams() {
+        JSONObject params = new JSONObject();
+        try {
+            JSONArray jsonArray = new JSONArray();
+            List<String> supportedDataTypes = delegate.getSupportedDataTypes();
+            for (String supportedDataType : supportedDataTypes) {
+                jsonArray.put(supportedDataType);
+            }
+            params.put("requested_data_types", jsonArray);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.toString());
+        }
+        return params;
     }
 
     private void checkoutPaired() {

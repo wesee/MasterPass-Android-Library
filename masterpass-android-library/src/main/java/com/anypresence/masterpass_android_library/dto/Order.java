@@ -1,5 +1,7 @@
 package com.anypresence.masterpass_android_library.dto;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,6 +12,7 @@ import java.io.Serializable;
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class Order implements Serializable {
+    private static final String LOG_TAG = Order.class.getSimpleName();
     public String orderNumber;
     public Wallet walletInfo;
     public CreditCard card;
@@ -22,7 +25,7 @@ public class Order implements Serializable {
         try {
             params.put("order_header_id", orderNumber);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.toString());
         }
         return params;
     }
@@ -34,7 +37,7 @@ public class Order implements Serializable {
             params.put("transaction_id", transactionId);
             params.put("pre_checkout_transaction_id", preCheckoutTransactionId);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, e.toString());
         }
         return params;
     }
