@@ -9,9 +9,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -34,11 +32,13 @@ public class ConnectionUtil {
                 HttpResponse response;
                 try {
                     HttpPost post = new HttpPost(url);
+                    post.setHeader("Accept", "application/json");
                     post.setHeader("Content-type", "application/json");
 
                     StringEntity se = new StringEntity(json.toString());
-                    se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+                    se.setContentType("application/json");
                     post.setEntity(se);
+
                     response = client.execute(post);
 
                     if (response != null) {
