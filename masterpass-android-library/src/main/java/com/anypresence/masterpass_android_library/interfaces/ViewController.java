@@ -15,4 +15,6 @@ public interface ViewController {
     void dismissViewControllerAnimated(boolean animated, OnCompleteCallback callback);
 
     Context getContext();
+
+    void runOnUiThread(Runnable runnable);
 }

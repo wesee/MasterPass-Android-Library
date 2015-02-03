@@ -24,6 +24,7 @@ import com.anypresence.masterpass_android_library.interfaces.ILightBox;
 import com.anypresence.masterpass_android_library.interfaces.IManager;
 import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
+import com.anypresence.masterpass_android_library.util.ConnectionUtil;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -163,10 +164,12 @@ public class MPManager implements ILightBox {
      */
     public void preCheckout(ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
         checkoutPaired();
-        JsonObjectRequest response = new JsonObjectRequest(Request.Method.POST, getPreCheckoutURL(), getPreCheckoutParams(),
-                new Response.Listener<JSONObject>() {
+        viewController.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                FutureCallback callbackCall = new FutureCallback<JSONObject>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onSuccess(JSONObject response) {
                         String responseString = response.toString();
                         Log.d("Received PreCheckout Data: ", responseString);
                         PreCheckoutResponse preCheckoutResponse = new Gson().fromJson(responseString, PreCheckoutResponse.class);
@@ -182,16 +185,16 @@ public class MPManager implements ILightBox {
                             callback.onSuccess(preCheckoutResponse);
                         }
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("Error PreCheckout Data: ", error.toString());
-                        callback.onFailure(error);
+                    public void onFailure(Throwable throwable) {
+                        Log.e(LOG_TAG, throwable.toString());
                     }
-                }
-        );
-        getRequestQueue(viewController).add(response);
+                };
+
+                ConnectionUtil.call(getPreCheckoutURL(), getPreCheckoutParams(), callbackCall);
+            }
+        });
     }
 
     public JSONObject getPreCheckoutParams() {
