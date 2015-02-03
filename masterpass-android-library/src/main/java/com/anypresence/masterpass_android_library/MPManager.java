@@ -15,7 +15,6 @@ import com.anypresence.masterpass_android_library.dto.Order;
 import com.anypresence.masterpass_android_library.dto.PreCheckoutResponse;
 import com.anypresence.masterpass_android_library.dto.StatusWithError;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
-import com.anypresence.masterpass_android_library.exception.BadRequestException;
 import com.anypresence.masterpass_android_library.exception.ManualCheckoutException;
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.exception.PairCheckoutException;
@@ -173,17 +172,18 @@ public class MPManager implements ILightBox {
                         String responseString = response.toString();
                         Log.d("Received PreCheckout Data: ", responseString);
                         PreCheckoutResponse preCheckoutResponse = new Gson().fromJson(responseString, PreCheckoutResponse.class);
-                        if (preCheckoutResponse.hasError()) {
-                            if (preCheckoutResponse.isNotPaired()) {
+                        //TODO:Check with David
+                        //if (preCheckoutResponse.hasError()) {
+                        //if (preCheckoutResponse.isNotPaired()) {
                                 // User is not paired. They may have disconnected
                                 // via the MasterPass console.
                                 // We will optionally reset that pairing status here
-                                delegate.resetUserPairing();
-                                callback.onFailure(new BadRequestException(preCheckoutResponse.errors));
-                            }
-                        } else {
+                        //delegate.resetUserPairing();
+                        //callback.onFailure(new BadRequestException(preCheckoutResponse.errors));
+                        //}
+                        //} else {
                             callback.onSuccess(preCheckoutResponse);
-                        }
+                        //}
                     }
 
                     @Override

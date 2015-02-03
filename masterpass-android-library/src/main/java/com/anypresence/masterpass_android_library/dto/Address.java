@@ -43,7 +43,7 @@ public class Address implements Serializable {
     @SerializedName(RECIPIENT_PHONE_NUMBER_KEY)
     public String recipientPhoneNumber;
     @SerializedName(SELECTED_AS_DEFAULT_KEY)
-    public Integer selectedAsDefault;
+    public Boolean selectedAsDefault;
     @SerializedName(SHIPPING_ALIAS_KEY)
     public String shippingAlias;
 }

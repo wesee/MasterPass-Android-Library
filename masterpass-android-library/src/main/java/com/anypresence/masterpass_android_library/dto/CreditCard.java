@@ -40,5 +40,5 @@ public class CreditCard implements Serializable {
     @SerializedName(LAST_FOUR_KEY)
     String lastFour;
     @SerializedName(SELECTED_AS_DEFAULT_KEY)
-    Integer selectedAsDefault;
+    Boolean selectedAsDefault;
 }
