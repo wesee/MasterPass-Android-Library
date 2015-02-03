@@ -2,10 +2,12 @@ package com.anypresence.masterpass_android_library.dto;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by diego.rotondale on 1/21/2015.
  */
-public class Contact {
+public class Contact implements Serializable {
 
     public static final String FIRST_NAME_KEY = "first_name";
     public static final String LAST_NAME_KEY = "last_name";
