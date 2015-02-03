@@ -83,6 +83,11 @@ public class MPLightBox extends Activity implements ViewController {
         return this;
     }
 
+    @Override
+    public String getXSessionId() {
+        return null;
+    }
+
     public void checkIfLoadDone(WebView webView) {
         if (progressDialog != null)
             progressDialog.dismiss();

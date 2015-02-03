@@ -162,7 +162,7 @@ public class MPManager implements ILightBox {
     /**
      * Retrieves the preCheckout data from the MasterPass service
      */
-    public void preCheckout(ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
+    public void preCheckout(final ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
         checkoutPaired();
         viewController.runOnUiThread(new Runnable() {
             @Override
@@ -192,7 +192,7 @@ public class MPManager implements ILightBox {
                     }
                 };
 
-                ConnectionUtil.call(getPreCheckoutURL(), getPreCheckoutParams(), callbackCall);
+                ConnectionUtil.call(getPreCheckoutURL(), viewController.getXSessionId(), getPreCheckoutParams(), callbackCall);
             }
         });
     }

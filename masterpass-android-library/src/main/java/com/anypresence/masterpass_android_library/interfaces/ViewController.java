@@ -17,4 +17,6 @@ public interface ViewController {
     Context getContext();
 
     void runOnUiThread(Runnable runnable);
+
+    String getXSessionId();
 }
