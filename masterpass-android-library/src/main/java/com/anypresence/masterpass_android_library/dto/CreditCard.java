@@ -22,23 +22,23 @@ public class CreditCard implements Serializable {
     public static final String SELECTED_AS_DEFAULT_KEY = "selected_as_default";
 
     @SerializedName(BRAND_ID_KEY)
-    String brandId;
+    public String brandId;
+    @SerializedName(CARD_HOLDER_NAME_KEY)
+    public String cardHolderName;
+    @SerializedName(EXPIRY_MONTH_KEY)
+    public String expiryMonth;
+    @SerializedName(EXPIRY_YEAR_KEY)
+    public String expiryYear;
+    @SerializedName(LAST_FOUR_KEY)
+    public String lastFour;
     @SerializedName(BRAND_NAME_KEY)
     String brandName;
     @SerializedName(BILLING_ADDRESS_KEY)
     Address billingAddress;
     @SerializedName(CARD_ALIAS_KEY)
     String cardAlias;
-    @SerializedName(CARD_HOLDER_NAME_KEY)
-    String cardHolderName;
     @SerializedName(CARD_ID_KEY)
     Integer cardId;
-    @SerializedName(EXPIRY_MONTH_KEY)
-    String expiryMonth;
-    @SerializedName(EXPIRY_YEAR_KEY)
-    String expiryYear;
-    @SerializedName(LAST_FOUR_KEY)
-    String lastFour;
     @SerializedName(SELECTED_AS_DEFAULT_KEY)
     Boolean selectedAsDefault;
 }
