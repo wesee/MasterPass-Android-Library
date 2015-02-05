@@ -2,7 +2,6 @@ package com.anypresence.masterpass_android_library;
 
 import android.util.Log;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -120,24 +119,21 @@ public class MPManager implements ILightBox {
     }
 
     protected void requestPairing(ViewController viewController, final FutureCallback<Details> callback) {
-        JsonObjectRequest response = new JsonObjectRequest(Request.Method.POST, getPairURL(), null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        String responseString = response.toString();
-                        Log.d("Approved Pairing Request: ", responseString);
-                        callback.onSuccess(new Gson().fromJson(responseString, Details.class));
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("Error Pairing Request: ", error.toString());
-                        callback.onFailure(error);
-                    }
-                }
-        );
-        getRequestQueue(viewController).add(response);
+        FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                String responseString = response.toString();
+                Log.d("Approved Pairing Request: ", responseString);
+                callback.onSuccess(new Gson().fromJson(responseString, Details.class));
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                Log.e("Error Pairing Request: ", error.toString());
+                callback.onFailure(error);
+            }
+        };
+        ConnectionUtil.call(getPairURL(), viewController.getXSessionId(), null, listener);
     }
 
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {

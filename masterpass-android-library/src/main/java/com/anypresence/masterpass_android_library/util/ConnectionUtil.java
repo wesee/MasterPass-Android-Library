@@ -36,9 +36,11 @@ public class ConnectionUtil {
                     post.setHeader("Accept", "application/json");
                     post.setHeader("Content-type", "application/json");
                     post.setHeader("X-Session-Id", xSessionId);
-                    StringEntity se = new StringEntity(json.toString());
-                    se.setContentType("application/json");
-                    post.setEntity(se);
+                    if (json != null) {
+                        StringEntity se = new StringEntity(json.toString());
+                        se.setContentType("application/json");
+                        post.setEntity(se);
+                    }
 
                     response = client.execute(post);
                     if (response != null) {
