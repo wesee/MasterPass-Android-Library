@@ -2,11 +2,6 @@ package com.anypresence.masterpass_android_library;
 
 import android.util.Log;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.anypresence.masterpass_android_library.activities.MPLightBox;
 import com.anypresence.masterpass_android_library.dto.Details;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
@@ -138,6 +133,7 @@ public class MPManager implements ILightBox {
 
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
         final MPLightBox mpLightBox = new MPLightBox();
+        mpLightBox.setViewController(viewController);
         mpLightBox.setDelegate(this);
         viewController.presentViewController(mpLightBox, true, new WebViewOptions(type, options));
     }
@@ -215,9 +211,10 @@ public class MPManager implements ILightBox {
 
     private void requestReturnCheckoutForOrder(Order order, ViewController viewController, final FutureCallback callback) {
         checkoutPaired();
-        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+        FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
+
             @Override
-            public void onResponse(JSONObject response) {
+            public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
                 Log.d("Approved Return Checkout Request: ", responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
@@ -228,16 +225,14 @@ public class MPManager implements ILightBox {
                 callback.onSuccess(details);
                 //}
             }
-        };
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onFailure(Throwable error) {
                 Log.e("Error Return Checkout Request: ", error.toString());
                 callback.onFailure(error);
             }
         };
-        getRequestQueue(viewController).add(new JsonObjectRequest(getCheckoutURL(), order.getParams(), listener, errorListener));
+        ConnectionUtil.call(getCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
     private void returnCheckoutForOrder(final Order order, final ViewController viewController) {
@@ -285,9 +280,9 @@ public class MPManager implements ILightBox {
     }
 
     private void requestPairCheckoutForOrder(Order order, ViewController viewController, final FutureCallback callback) {
-        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+        FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
                 Log.d("Approved Pair Checkout Request: ", responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
@@ -298,22 +293,20 @@ public class MPManager implements ILightBox {
                 callback.onSuccess(details);
                 //}
             }
-        };
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onFailure(Throwable error) {
                 Log.e("Error Return Checkout Request: ", error.toString());
                 callback.onFailure(error);
             }
         };
-        getRequestQueue(viewController).add(new JsonObjectRequest(getPairAndCheckoutURL(), order.getParams(), listener, errorListener));
+        ConnectionUtil.call(getPairAndCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
     private void completePairCheckoutForOrder(Order order, ViewController viewController) {
-        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+        FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
                 Log.d("Completed Checkout Successfully: ", responseString);
                 StatusWithError status = new Gson().fromJson(responseString, StatusWithError.class);
@@ -323,23 +316,21 @@ public class MPManager implements ILightBox {
                     delegate.pairCheckoutDidComplete(true, null);
                 }
             }
-        };
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onFailure(Throwable error) {
                 Log.e("Error in Completed Checkout Successfully: ", error.toString());
             }
         };
-        getRequestQueue(viewController).add(new JsonObjectRequest(getCompletePairCheckout(), order.getCompleteParams(), listener, errorListener));
+        ConnectionUtil.call(getCompletePairCheckout(), viewController.getXSessionId(), order.getCompleteParams(), listener);
     }
 
     //Manual Checkout
 
     public void completeManualCheckout(Order order, ViewController viewController) {
-        Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
+        FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
                 Log.d("Completed Manual Checkout Successfully: ", responseString);
                 StatusWithError status = new Gson().fromJson(responseString, StatusWithError.class);
@@ -349,16 +340,13 @@ public class MPManager implements ILightBox {
                     delegate.manualCheckoutDidComplete(true, null);
                 }
             }
-        };
 
-        Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onFailure(Throwable error) {
                 Log.e("Error in Completed Manual Checkout Successfully: ", error.toString());
             }
         };
-
-        getRequestQueue(viewController).add(new JsonObjectRequest(getManualCheckoutURL(), order.getParams(), listener, errorListener));
+        ConnectionUtil.call(getManualCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
     //ILightBox
@@ -416,7 +404,4 @@ public class MPManager implements ILightBox {
         return manualCheckoutURL;
     }
 
-    public RequestQueue getRequestQueue(ViewController viewController) {
-        return Volley.newRequestQueue(viewController.getContext());
-    }
 }

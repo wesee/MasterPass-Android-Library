@@ -2,26 +2,20 @@ package com.anypresence.masterpass_android_library.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.anypresence.masterpass_android_library.Constants;
 import com.anypresence.masterpass_android_library.MPManager;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Status;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
-import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
+import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
+import com.anypresence.masterpass_android_library.util.ConnectionUtil;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -33,7 +27,7 @@ import java.net.URISyntaxException;
  * Created by diego.rotondale on 16/09/2014.
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
-public class MPLightBox extends Activity implements ViewController {
+public class MPLightBox extends Activity {
     private static final String LOG_TAG = MPLightBox.class.getSimpleName();
     private static final String URL = "file:///android_asset/mp_lightbox_base.html";
     private MPLightBoxType type;
@@ -41,6 +35,10 @@ public class MPLightBox extends Activity implements ViewController {
     private WebView web;
     private ProgressDialog progressDialog;
     private MPManager delegate;
+    private ViewController viewController;
+
+    public MPLightBox() {
+    }
 
     public void setDelegate(MPManager delegate) {
         this.delegate = delegate;
@@ -70,24 +68,6 @@ public class MPLightBox extends Activity implements ViewController {
         web.setWebViewClient(new MPLibraryWebViewClient());
     }
 
-    @Override
-    public void presentViewController(Activity activity, Boolean animated, WebViewOptions options) {
-    }
-
-    @Override
-    public void dismissViewControllerAnimated(boolean animate, OnCompleteCallback onCompleteCallback) {
-    }
-
-    @Override
-    public Context getContext() {
-        return this;
-    }
-
-    @Override
-    public String getXSessionId() {
-        return null;
-    }
-
     public void checkIfLoadDone(WebView webView) {
         if (progressDialog != null)
             progressDialog.dismiss();
@@ -112,8 +92,12 @@ public class MPLightBox extends Activity implements ViewController {
         return null;
     }
 
-    private RequestQueue getRequestQueue() {
-        return Volley.newRequestQueue(this);
+    public ViewController getViewController() {
+        return viewController;
+    }
+
+    public void setViewController(ViewController viewController) {
+        this.viewController = viewController;
     }
 
     public enum MPLightBoxType {
@@ -137,34 +121,35 @@ public class MPLightBox extends Activity implements ViewController {
                 Log.d("urlConverted: ", urlConverted);
                 Log.d("getCallbackURL: ", options.getCallbackURL());
                 if (urlConverted.equals(options.getCallbackURL())) {
-                    JsonObjectRequest response = new JsonObjectRequest(Request.Method.GET, urlConverted, null,
-                            new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    String responseString = response.toString();
-                                    Status status = new Gson().fromJson(responseString, Status.class);
-                                    boolean success = !status.hasError();
-                                    switch (type) {
-                                        case MPLightBoxTypeConnect:
-                                            delegate.pairingViewDidCompletePairing(MPLightBox.this, success, null);
-                                            break;
-                                        case MPLightBoxTypeCheckout:
-                                            delegate.lightBoxDidCompleteCheckout(MPLightBox.this, success, null);
-                                            break;
-                                        case MPLightBoxTypePreCheckout:
-                                            delegate.lightBoxDidCompletePreCheckout(MPLightBox.this, success, null, null);
-                                            break;
-                                    }
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.e(LOG_TAG, error.toString());
+                    FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            String responseString = response.toString();
+                            Status status = new Gson().fromJson(responseString, Status.class);
+                            if (status == null) {
+                                MPLightBox.this.finish();
+                            } else {
+                                boolean success = !status.hasError();
+                                switch (type) {
+                                    case MPLightBoxTypeConnect:
+                                        delegate.pairingViewDidCompletePairing(viewController, success, null);
+                                        break;
+                                    case MPLightBoxTypeCheckout:
+                                        delegate.lightBoxDidCompleteCheckout(viewController, success, null);
+                                        break;
+                                    case MPLightBoxTypePreCheckout:
+                                        delegate.lightBoxDidCompletePreCheckout(viewController, success, null, null);
+                                        break;
                                 }
                             }
-                    );
-                    getRequestQueue().add(response);
+                        }
+
+                        @Override
+                        public void onFailure(Throwable error) {
+                            Log.e(LOG_TAG, error.toString());
+                        }
+                    };
+                    ConnectionUtil.call(urlConverted, viewController.getXSessionId(), null, listener);
                 } else {
                     web.loadUrl(url);
                     return false;

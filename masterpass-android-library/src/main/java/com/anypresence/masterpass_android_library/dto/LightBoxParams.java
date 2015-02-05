@@ -2,6 +2,7 @@ package com.anypresence.masterpass_android_library.dto;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * Copyright (c) 2015 AnyPresence, Inc. All rights reserved.
  */
 public class LightBoxParams implements Serializable {
+    private static final String LOG_TAG = LightBoxParams.class.getSimpleName();
     private Details details;
     private String version;
     private List<String> requestedDataTypes;
@@ -47,6 +49,7 @@ public class LightBoxParams implements Serializable {
     public String toJson() {
         JSONObject json = new JSONObject();
         try {
+            json.put("requestedDataTypes", getRequestDataTypes());
             if (details.checkoutRequestToken != null)
                 json.put("requestToken", details.checkoutRequestToken);
             if (details.merchantCheckoutId != null)
@@ -70,6 +73,14 @@ public class LightBoxParams implements Serializable {
             Log.e(LightBoxParams.class.getSimpleName(), e.getMessage());
         }
         return json.toString();
+    }
+
+    public JSONArray getRequestDataTypes() {
+        JSONArray jsonArray = new JSONArray();
+        for (String supportedDataType : requestedDataTypes) {
+            jsonArray.put(supportedDataType);
+        }
+        return jsonArray;
     }
 
     public String getCallbackURL() {
