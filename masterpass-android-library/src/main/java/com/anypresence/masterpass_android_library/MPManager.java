@@ -118,7 +118,7 @@ public class MPManager implements ILightBox {
             @Override
             public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
-                Log.d("Approved Pairing Request: ", responseString);
+                Log.d(LOG_TAG, "Approved Pairing Request: " + responseString);
                 callback.onSuccess(new Gson().fromJson(responseString, Details.class));
             }
 
@@ -213,7 +213,7 @@ public class MPManager implements ILightBox {
             @Override
             public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
-                Log.d("Approved Return Checkout Request: ", responseString);
+                Log.d(LOG_TAG, "Approved Return Checkout Request: " + responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
                 //TODO:Check with David
                 //if (details.hasError()) {
@@ -225,7 +225,7 @@ public class MPManager implements ILightBox {
 
             @Override
             public void onFailure(Throwable error) {
-                Log.e("Error Return Checkout Request: ", error.toString());
+                Log.e(LOG_TAG, "Error Return Checkout Request: " + error.toString());
                 callback.onFailure(error);
             }
         };
@@ -281,7 +281,7 @@ public class MPManager implements ILightBox {
             @Override
             public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
-                Log.d("Approved Pair Checkout Request: ", responseString);
+                Log.d(LOG_TAG, "Approved Pair Checkout Request: " + responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
                 //TODO:Check with David
                 //if (details.hasError()) {
@@ -293,7 +293,7 @@ public class MPManager implements ILightBox {
 
             @Override
             public void onFailure(Throwable error) {
-                Log.e("Error Return Checkout Request: ", error.toString());
+                Log.e(LOG_TAG, "Error Return Checkout Request: " + error.toString());
                 callback.onFailure(error);
             }
         };
@@ -305,7 +305,7 @@ public class MPManager implements ILightBox {
             @Override
             public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
-                Log.d("Completed Checkout Successfully: ", responseString);
+                Log.d(LOG_TAG, "Completed Checkout Successfully: " + responseString);
                 StatusWithError status = new Gson().fromJson(responseString, StatusWithError.class);
                 if (status.hasError()) {
                     delegate.pairCheckoutDidComplete(false, new PairCheckoutException(status.errors));
@@ -316,7 +316,7 @@ public class MPManager implements ILightBox {
 
             @Override
             public void onFailure(Throwable error) {
-                Log.e("Error in Completed Checkout Successfully: ", error.toString());
+                Log.e(LOG_TAG, "Error in Completed Checkout Successfully: " + error.toString());
             }
         };
         ConnectionUtil.call(getCompletePairCheckout(), viewController.getXSessionId(), order.getCompleteParams(), listener);
@@ -329,7 +329,7 @@ public class MPManager implements ILightBox {
             @Override
             public void onSuccess(JSONObject response) {
                 String responseString = response.toString();
-                Log.d("Completed Manual Checkout Successfully: ", responseString);
+                Log.d(LOG_TAG, "Completed Manual Checkout Successfully: " + responseString);
                 StatusWithError status = new Gson().fromJson(responseString, StatusWithError.class);
                 if (status.hasError()) {
                     delegate.manualCheckoutDidComplete(false, new ManualCheckoutException(status.errors));
@@ -340,7 +340,7 @@ public class MPManager implements ILightBox {
 
             @Override
             public void onFailure(Throwable error) {
-                Log.e("Error in Completed Manual Checkout Successfully: ", error.toString());
+                Log.e(LOG_TAG, "Error in Completed Manual Checkout Successfully: " + error.toString());
             }
         };
         ConnectionUtil.call(getManualCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
@@ -349,12 +349,7 @@ public class MPManager implements ILightBox {
     //ILightBox
     @Override
     public void pairingViewDidCompletePairing(ViewController pairingViewController, final Boolean success, final Throwable error) {
-        pairingViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
-            @Override
-            public void onComplete() {
-                delegate.pairingDidComplete(success, error);
-            }
-        });
+        delegate.pairingDidComplete(success, error);
     }
 
     @Override

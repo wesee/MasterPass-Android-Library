@@ -11,16 +11,14 @@ import android.webkit.WebViewClient;
 import com.anypresence.masterpass_android_library.Constants;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
-import com.anypresence.masterpass_android_library.dto.Status;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
-import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
-import com.anypresence.masterpass_android_library.util.ConnectionUtil;
-import com.google.gson.Gson;
 
-import org.json.JSONObject;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Created by diego.rotondale on 16/09/2014.
@@ -33,7 +31,6 @@ public class MPLightBox extends Activity {
     private LightBoxParams options;
     private WebView web;
     private ProgressDialog progressDialog;
-    private String xSessionId;
 
     public MPLightBox() {
     }
@@ -49,7 +46,6 @@ public class MPLightBox extends Activity {
         progressDialog.setCancelable(false);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            xSessionId = extras.getString(Constants.X_SESSION_ID);
             WebViewOptions options = (WebViewOptions) extras.getSerializable(Constants.OPTIONS_PARAMETER);
             initiateLightBoxOfTypeWithOptions(options.type, options.options);
         }
@@ -108,32 +104,20 @@ public class MPLightBox extends Activity {
                 Log.d("urlConverted: ", urlConverted);
                 Log.d("getCallbackURL: ", options.getCallbackURL());
                 if (urlConverted.equals(options.getCallbackURL())) {
-                    FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
-                        @Override
-                        public void onSuccess(JSONObject response) {
-                            String responseString = response.toString();
-                            Status status = new Gson().fromJson(responseString, Status.class);
-                            if (status == null) {
-                                MPLightBox.this.finish();
-                            } else {
-                                boolean success = !status.hasError();
-                                Intent returnIntent = new Intent();
-                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, success);
-                                setResult(RESULT_OK, returnIntent);
-                                finish();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Throwable error) {
-                            Log.e(LOG_TAG, error.toString());
+                    List<NameValuePair> params = URLEncodedUtils.parse(uri, "UTF-8");
+                    for (NameValuePair param : params) {
+                        if (param.getName().equals("mpstatus")) {
                             Intent returnIntent = new Intent();
-                            returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
-                            setResult(RESULT_CANCELED, returnIntent);
+                            returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, true);
+                            setResult(RESULT_OK, returnIntent);
                             finish();
+                            return false;
                         }
-                    };
-                    ConnectionUtil.call(urlConverted, xSessionId, null, listener);
+                    }
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
+                    setResult(RESULT_CANCELED, returnIntent);
+                    finish();
                 } else {
                     web.loadUrl(url);
                     return false;
