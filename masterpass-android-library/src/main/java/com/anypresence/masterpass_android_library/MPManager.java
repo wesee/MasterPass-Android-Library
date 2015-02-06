@@ -132,10 +132,7 @@ public class MPManager implements ILightBox {
     }
 
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
-        final MPLightBox mpLightBox = new MPLightBox();
-        mpLightBox.setViewController(viewController);
-        mpLightBox.setDelegate(this);
-        viewController.presentViewController(mpLightBox, true, new WebViewOptions(type, options));
+        viewController.presentViewController(new MPLightBox(), true, new WebViewOptions(type, options));
     }
 
     /**
@@ -162,19 +159,19 @@ public class MPManager implements ILightBox {
                     @Override
                     public void onSuccess(JSONObject response) {
                         String responseString = response.toString();
-                        Log.d("Received PreCheckout Data: ", responseString);
+                        Log.d(LOG_TAG, "Received PreCheckout Data: " + responseString);
                         PreCheckoutResponse preCheckoutResponse = new Gson().fromJson(responseString, PreCheckoutResponse.class);
                         //TODO:Check with David
                         //if (preCheckoutResponse.hasError()) {
                         //if (preCheckoutResponse.isNotPaired()) {
-                                // User is not paired. They may have disconnected
-                                // via the MasterPass console.
-                                // We will optionally reset that pairing status here
+                        // User is not paired. They may have disconnected
+                        // via the MasterPass console.
+                        // We will optionally reset that pairing status here
                         //delegate.resetUserPairing();
                         //callback.onFailure(new BadRequestException(preCheckoutResponse.errors));
                         //}
                         //} else {
-                            callback.onSuccess(preCheckoutResponse);
+                        callback.onSuccess(preCheckoutResponse);
                         //}
                     }
 

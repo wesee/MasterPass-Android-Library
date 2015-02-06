@@ -2,19 +2,18 @@ package com.anypresence.masterpass_android_library.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.anypresence.masterpass_android_library.Constants;
-import com.anypresence.masterpass_android_library.MPManager;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Status;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
-import com.anypresence.masterpass_android_library.interfaces.ViewController;
 import com.anypresence.masterpass_android_library.util.ConnectionUtil;
 import com.google.gson.Gson;
 
@@ -34,14 +33,9 @@ public class MPLightBox extends Activity {
     private LightBoxParams options;
     private WebView web;
     private ProgressDialog progressDialog;
-    private MPManager delegate;
-    private ViewController viewController;
+    private String xSessionId;
 
     public MPLightBox() {
-    }
-
-    public void setDelegate(MPManager delegate) {
-        this.delegate = delegate;
     }
 
     @Override
@@ -55,6 +49,7 @@ public class MPLightBox extends Activity {
         progressDialog.setCancelable(false);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            xSessionId = extras.getString(Constants.X_SESSION_ID);
             WebViewOptions options = (WebViewOptions) extras.getSerializable(Constants.OPTIONS_PARAMETER);
             initiateLightBoxOfTypeWithOptions(options.type, options.options);
         }
@@ -92,20 +87,12 @@ public class MPLightBox extends Activity {
         return null;
     }
 
-    public ViewController getViewController() {
-        return viewController;
-    }
-
-    public void setViewController(ViewController viewController) {
-        this.viewController = viewController;
-    }
-
     public enum MPLightBoxType {
         MPLightBoxTypeConnect(0),
         MPLightBoxTypeCheckout(1),
         MPLightBoxTypePreCheckout(2);
 
-        int value;
+        public int value;
 
         MPLightBoxType(int value) {
             this.value = value;
@@ -130,26 +117,23 @@ public class MPLightBox extends Activity {
                                 MPLightBox.this.finish();
                             } else {
                                 boolean success = !status.hasError();
-                                switch (type) {
-                                    case MPLightBoxTypeConnect:
-                                        delegate.pairingViewDidCompletePairing(viewController, success, null);
-                                        break;
-                                    case MPLightBoxTypeCheckout:
-                                        delegate.lightBoxDidCompleteCheckout(viewController, success, null);
-                                        break;
-                                    case MPLightBoxTypePreCheckout:
-                                        delegate.lightBoxDidCompletePreCheckout(viewController, success, null, null);
-                                        break;
-                                }
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, success);
+                                setResult(RESULT_OK, returnIntent);
+                                finish();
                             }
                         }
 
                         @Override
                         public void onFailure(Throwable error) {
                             Log.e(LOG_TAG, error.toString());
+                            Intent returnIntent = new Intent();
+                            returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
+                            setResult(RESULT_CANCELED, returnIntent);
+                            finish();
                         }
                     };
-                    ConnectionUtil.call(urlConverted, viewController.getXSessionId(), null, listener);
+                    ConnectionUtil.call(urlConverted, xSessionId, null, listener);
                 } else {
                     web.loadUrl(url);
                     return false;
