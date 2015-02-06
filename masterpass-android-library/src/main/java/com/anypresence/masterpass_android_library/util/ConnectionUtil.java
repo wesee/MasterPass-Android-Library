@@ -7,7 +7,9 @@ import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
@@ -24,7 +26,7 @@ public class ConnectionUtil {
     private static final String LOG_TAG = ConnectionUtil.class.getSimpleName();
     private static final Integer TIMEOUT = 10000;
 
-    public static void call(final String url, final String xSessionId, final JSONObject json, final FutureCallback<JSONObject> listener) {
+    public static void call(final Boolean post, final String url, final String xSessionId, final JSONObject json, final FutureCallback<JSONObject> listener) {
         Thread t = new Thread() {
             public void run() {
                 Looper.prepare();
@@ -32,17 +34,21 @@ public class ConnectionUtil {
                 HttpConnectionParams.setConnectionTimeout(client.getParams(), TIMEOUT);
                 HttpResponse response;
                 try {
-                    HttpPost post = new HttpPost(url);
-                    post.setHeader("Accept", "application/json");
-                    post.setHeader("Content-type", "application/json");
-                    post.setHeader("X-Session-Id", xSessionId);
-                    if (json != null) {
-                        StringEntity se = new StringEntity(json.toString());
-                        se.setContentType("application/json");
-                        post.setEntity(se);
+                    HttpUriRequest request = null;
+                    if (post) {
+                        request = new HttpPost(url);
+                        request.setHeader("Accept", "application/json");
+                        request.setHeader("Content-type", "application/json");
+                        if (json != null) {
+                            StringEntity se = new StringEntity(json.toString());
+                            se.setContentType("application/json");
+                            ((HttpPost) request).setEntity(se);
+                        }
+                    } else {
+                        request = new HttpGet(url);
                     }
-
-                    response = client.execute(post);
+                    request.setHeader("X-Session-Id", xSessionId);
+                    response = client.execute(request);
                     if (response != null) {
                         StatusLine statusLine = response.getStatusLine();
                         int statusCode = statusLine.getStatusCode();

@@ -128,7 +128,7 @@ public class MPManager implements ILightBox {
                 callback.onFailure(error);
             }
         };
-        ConnectionUtil.call(getPairURL(), viewController.getXSessionId(), null, listener);
+        ConnectionUtil.call(true, getPairURL(), viewController.getXSessionId(), null, listener);
     }
 
     private void showLightBoxWindowOfType(final MPLightBox.MPLightBoxType type, final LightBoxParams options, ViewController viewController) {
@@ -181,7 +181,7 @@ public class MPManager implements ILightBox {
                     }
                 };
 
-                ConnectionUtil.call(getPreCheckoutURL(), viewController.getXSessionId(), getPreCheckoutParams(), callbackCall);
+                ConnectionUtil.call(true, getPreCheckoutURL(), viewController.getXSessionId(), getPreCheckoutParams(), callbackCall);
             }
         });
     }
@@ -229,7 +229,7 @@ public class MPManager implements ILightBox {
                 callback.onFailure(error);
             }
         };
-        ConnectionUtil.call(getCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
+        ConnectionUtil.call(true, getCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
     private void returnCheckoutForOrder(final Order order, final ViewController viewController) {
@@ -297,7 +297,7 @@ public class MPManager implements ILightBox {
                 callback.onFailure(error);
             }
         };
-        ConnectionUtil.call(getPairAndCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
+        ConnectionUtil.call(true, getPairAndCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
     private void completePairCheckoutForOrder(Order order, ViewController viewController) {
@@ -319,7 +319,7 @@ public class MPManager implements ILightBox {
                 Log.e(LOG_TAG, "Error in Completed Checkout Successfully: " + error.toString());
             }
         };
-        ConnectionUtil.call(getCompletePairCheckout(), viewController.getXSessionId(), order.getCompleteParams(), listener);
+        ConnectionUtil.call(true, getCompletePairCheckout(), viewController.getXSessionId(), order.getCompleteParams(), listener);
     }
 
     //Manual Checkout
@@ -343,7 +343,7 @@ public class MPManager implements ILightBox {
                 Log.e(LOG_TAG, "Error in Completed Manual Checkout Successfully: " + error.toString());
             }
         };
-        ConnectionUtil.call(getManualCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
+        ConnectionUtil.call(true, getManualCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
     //ILightBox

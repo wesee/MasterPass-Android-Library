@@ -11,14 +11,16 @@ import android.webkit.WebViewClient;
 import com.anypresence.masterpass_android_library.Constants;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
+import com.anypresence.masterpass_android_library.dto.Status;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
+import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
+import com.anypresence.masterpass_android_library.util.ConnectionUtil;
+import com.google.gson.Gson;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 /**
  * Created by diego.rotondale on 16/09/2014.
@@ -31,6 +33,7 @@ public class MPLightBox extends Activity {
     private LightBoxParams options;
     private WebView web;
     private ProgressDialog progressDialog;
+    private String xSessionId;
 
     public MPLightBox() {
     }
@@ -46,6 +49,7 @@ public class MPLightBox extends Activity {
         progressDialog.setCancelable(false);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            xSessionId = extras.getString(Constants.X_SESSION_ID);
             WebViewOptions options = (WebViewOptions) extras.getSerializable(Constants.OPTIONS_PARAMETER);
             initiateLightBoxOfTypeWithOptions(options.type, options.options);
         }
@@ -104,20 +108,35 @@ public class MPLightBox extends Activity {
                 Log.d("urlConverted: ", urlConverted);
                 Log.d("getCallbackURL: ", options.getCallbackURL());
                 if (urlConverted.equals(options.getCallbackURL())) {
-                    List<NameValuePair> params = URLEncodedUtils.parse(uri, "UTF-8");
-                    for (NameValuePair param : params) {
-                        if (param.getName().equals("mpstatus")) {
-                            Intent returnIntent = new Intent();
-                            returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, true);
-                            setResult(RESULT_OK, returnIntent);
-                            finish();
-                            return false;
+                    FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            String responseString = response.toString();
+                            Status status = new Gson().fromJson(responseString, Status.class);
+                            if (status != null && status.status == null) {
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, true);
+                                setResult(RESULT_OK, returnIntent);
+                                finish();
+                            } else {
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
+                                setResult(RESULT_CANCELED, returnIntent);
+                                finish();
+                            }
                         }
-                    }
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
-                    setResult(RESULT_CANCELED, returnIntent);
-                    finish();
+
+                        @Override
+                        public void onFailure(Throwable error) {
+                            Log.e(LOG_TAG, error.toString());
+                            Intent returnIntent = new Intent();
+                            returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
+                            setResult(RESULT_CANCELED, returnIntent);
+                            finish();
+                        }
+                    };
+                    ConnectionUtil.call(false, urlConverted, xSessionId, null, listener);
+
                 } else {
                     web.loadUrl(url);
                     return false;
