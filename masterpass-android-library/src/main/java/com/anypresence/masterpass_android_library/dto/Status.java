@@ -10,6 +10,6 @@ public class Status implements Serializable {
     public String status;
 
     public boolean hasError() {
-        return status.equals("error");
+        return status != null && status.equals("error");
     }
 }
