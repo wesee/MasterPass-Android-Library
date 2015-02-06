@@ -255,13 +255,14 @@ public class MPManager implements ILightBox {
 
     //Pair Checkout
 
-    public void pairCheckoutForOrder(Order order, final ViewController viewController) {
+    public void pairCheckoutForOrder(final Order order, final ViewController viewController) {
         FutureCallback<Details> callback = new FutureCallback<Details>() {
             @Override
             public void onSuccess(Details details) {
                 LightBoxParams options = new LightBoxParams();
                 options.setRequestedDataTypes(delegate.getSupportedDataTypes());
                 options.setDetails(details);
+                options.setOrder(order);
                 options.setAllowedCardType(delegate.getSupportedCardTypes());
                 options.setRequestPairing(1);
                 options.setVersion(MP_VERSION);
