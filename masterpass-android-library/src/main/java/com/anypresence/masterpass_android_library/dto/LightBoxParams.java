@@ -101,6 +101,8 @@ public class LightBoxParams implements Serializable {
         if (details.merchantCheckoutId != null)
             json.put("merchantCheckoutId", details.merchantCheckoutId);
         json.put("allowedCardTypes", getAllowedCardTypes());
+        if (details.callbackUrl != null)
+            json.put("callbackUrl", getCallbackURL());
         if (requestPairing != null)
             json.put("requestPairing", requestPairing);
         if (version != null)
