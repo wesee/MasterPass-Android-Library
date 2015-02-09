@@ -18,9 +18,18 @@ public class LightBoxParams implements Serializable {
     private Details details;
     private String version;
     private List<String> requestedDataTypes;
-    private Integer requestPairing;
+    private Boolean requestPairing;
     private List<String> allowedCardType;
     private Order order;
+    private MPLightBoxParamsType type;
+
+    public MPLightBoxParamsType getType() {
+        return type;
+    }
+
+    public void setType(MPLightBoxParamsType type) {
+        this.type = type;
+    }
 
     public void setRequestedDataTypes(List<String> requestedDataTypes) {
         this.requestedDataTypes = requestedDataTypes;
@@ -30,7 +39,7 @@ public class LightBoxParams implements Serializable {
         this.details = details;
     }
 
-    public void setRequestPairing(Integer requestPairing) {
+    public void setRequestPairing(Boolean requestPairing) {
         this.requestPairing = requestPairing;
     }
 
@@ -49,30 +58,53 @@ public class LightBoxParams implements Serializable {
     public String toJson() {
         JSONObject json = new JSONObject();
         try {
-            json.put("requestedDataTypes", getRequestDataTypes());
-            if (details.checkoutRequestToken != null)
-                json.put("requestToken", details.checkoutRequestToken);
-            if (details.merchantCheckoutId != null)
-                json.put("merchantCheckoutId", details.merchantCheckoutId);
-            if (details.callbackUrl != null)
-                json.put("callbackUrl", getCallbackURL());
-            if (version != null)
-                json.put("version", version);
-            if (order != null) {
-                if (order.card != null)
-                    json.put("cardId", order.card.cardId);
-                if (order.shippingAddress != null)
-                    json.put("shippingId", order.shippingAddress.addressId);
-                if (order.walletInfo != null) {
-                    json.put("precheckoutTransactionId", order.walletInfo.preCheckoutTransactionId);
-                    json.put("walletName", order.walletInfo.walletName);
-                    json.put("consumerWalletId", order.walletInfo.consumerWalletId);
-                }
+            if (this.type == MPLightBoxParamsType.Checkout) {
+                getCheckoutParams(json);
+            } else {
+                getParams(json);
             }
         } catch (JSONException e) {
             Log.e(LightBoxParams.class.getSimpleName(), e.getMessage());
         }
         return json.toString();
+    }
+
+    private void getParams(JSONObject json) throws JSONException {
+        json.put("requestedDataTypes", getRequestDataTypes());
+        if (details.checkoutRequestToken != null)
+            json.put("requestToken", details.checkoutRequestToken);
+        if (details.merchantCheckoutId != null)
+            json.put("merchantCheckoutId", details.merchantCheckoutId);
+        if (details.callbackUrl != null)
+            json.put("callbackUrl", getCallbackURL());
+        if (version != null)
+            json.put("version", version);
+        if (order != null) {
+            if (order.card != null)
+                json.put("cardId", order.card.cardId);
+            if (order.shippingAddress != null)
+                json.put("shippingId", order.shippingAddress.addressId);
+            if (order.walletInfo != null) {
+                json.put("precheckoutTransactionId", order.walletInfo.preCheckoutTransactionId);
+                json.put("walletName", order.walletInfo.walletName);
+                json.put("consumerWalletId", order.walletInfo.consumerWalletId);
+            }
+        }
+    }
+
+    private void getCheckoutParams(JSONObject json) throws JSONException {
+        if (details.checkoutRequestToken != null)
+            json.put("requestToken", details.checkoutRequestToken);
+        if (details.pairingRequestToken != null)
+            json.put("pairingRequestToken", details.pairingRequestToken);
+        json.put("requestedDataTypes", getRequestDataTypes());
+        if (details.merchantCheckoutId != null)
+            json.put("merchantCheckoutId", details.merchantCheckoutId);
+        json.put("allowedCardTypes", getAllowedCardTypes());
+        if (requestPairing != null)
+            json.put("requestPairing", requestPairing);
+        if (version != null)
+            json.put("version", version);
     }
 
     public JSONArray getRequestDataTypes() {
@@ -83,7 +115,26 @@ public class LightBoxParams implements Serializable {
         return jsonArray;
     }
 
+    public JSONArray getAllowedCardTypes() {
+        JSONArray jsonArray = new JSONArray();
+        for (String supportedDataType : allowedCardType) {
+            jsonArray.put(supportedDataType);
+        }
+        return jsonArray;
+    }
+
     public String getCallbackURL() {
         return details.callbackUrl.replace("\\", "");
+    }
+
+    public enum MPLightBoxParamsType {
+        Checkout(0),
+        MPLightBoxTypeCheckout(1),;
+
+        public int value;
+
+        MPLightBoxParamsType(int value) {
+            this.value = value;
+        }
     }
 }

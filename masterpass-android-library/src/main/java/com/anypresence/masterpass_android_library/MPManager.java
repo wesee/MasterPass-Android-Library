@@ -100,7 +100,7 @@ public class MPManager implements ILightBox {
                 LightBoxParams options = new LightBoxParams();
                 options.setRequestedDataTypes(delegate.getSupportedDataTypes());
                 options.setDetails(details);
-                options.setRequestPairing(1);
+                options.setRequestPairing(true);
                 options.setVersion(MP_VERSION);
                 showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
             }
@@ -268,8 +268,9 @@ public class MPManager implements ILightBox {
                 options.setDetails(details);
                 options.setOrder(order);
                 options.setAllowedCardType(delegate.getSupportedCardTypes());
-                options.setRequestPairing(1);
+                options.setRequestPairing(true);
                 options.setVersion(MP_VERSION);
+                options.setType(LightBoxParams.MPLightBoxParamsType.Checkout);
                 showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
             }
 
