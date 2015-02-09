@@ -14,16 +14,15 @@ public class Wallet implements Serializable {
     public static final String CONSUMER_WALLET_ID_KEY = "consumer_wallet_id";
     public static final String WALLET_PARTNER_LOGO_URL_KEY = "wallet_partner_logo_url";
     public static final String MASTERPASS_LOGO_URL_KEY = "masterpass_logo_url";
-
+    @SerializedName(WALLET_PARTNER_LOGO_URL_KEY)
+    public String walletPartnerLogoUrl;
+    @SerializedName(MASTERPASS_LOGO_URL_KEY)
+    public String masterpassLogoUrl;
     @SerializedName(WALLET_NAME)
     String walletName;
     @SerializedName(PRE_CHECKOUT_TRANSACTION_ID_KEY)
     String preCheckoutTransactionId;
     @SerializedName(CONSUMER_WALLET_ID_KEY)
     String consumerWalletId;
-    @SerializedName(WALLET_PARTNER_LOGO_URL_KEY)
-    String walletPartnerLogoUrl;
-    @SerializedName(MASTERPASS_LOGO_URL_KEY)
-    String masterpassLogoUrl;
 
 }
