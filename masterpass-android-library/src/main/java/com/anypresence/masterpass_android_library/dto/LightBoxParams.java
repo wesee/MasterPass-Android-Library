@@ -58,7 +58,7 @@ public class LightBoxParams implements Serializable {
     public String toJson() {
         JSONObject json = new JSONObject();
         try {
-            if (this.type == MPLightBoxParamsType.Checkout) {
+            if (this.type != null && this.type == MPLightBoxParamsType.Checkout) {
                 getCheckoutParams(json);
             } else {
                 getParams(json);
@@ -70,7 +70,8 @@ public class LightBoxParams implements Serializable {
     }
 
     private void getParams(JSONObject json) throws JSONException {
-        json.put("requestedDataTypes", getRequestDataTypes());
+        if (requestedDataTypes != null)
+            json.put("requestedDataTypes", getRequestDataTypes());
         if (details.checkoutRequestToken != null)
             json.put("requestToken", details.checkoutRequestToken);
         if (details.merchantCheckoutId != null)
@@ -95,14 +96,16 @@ public class LightBoxParams implements Serializable {
     private void getCheckoutParams(JSONObject json) throws JSONException {
         if (details.checkoutRequestToken != null)
             json.put("requestToken", details.checkoutRequestToken);
-        if (details.pairingRequestToken != null)
-            json.put("pairingRequestToken", details.pairingRequestToken);
-        json.put("requestedDataTypes", getRequestDataTypes());
         if (details.merchantCheckoutId != null)
             json.put("merchantCheckoutId", details.merchantCheckoutId);
-        json.put("allowedCardTypes", getAllowedCardTypes());
+        if (requestedDataTypes != null)
+            json.put("requestedDataTypes", getRequestDataTypes());
         if (details.callbackUrl != null)
             json.put("callbackUrl", getCallbackURL());
+        if (details.pairingRequestToken != null)
+            json.put("pairingRequestToken", details.pairingRequestToken);
+        if (allowedCardType != null)
+            json.put("allowedCardTypes", getAllowedCardTypes());
         if (requestPairing != null)
             json.put("requestPairing", requestPairing);
         if (version != null)

@@ -236,7 +236,7 @@ public class MPManager implements ILightBox {
         ConnectionUtil.call(true, getCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
-    private void returnCheckoutForOrder(final Order order, final ViewController viewController) {
+    public void returnCheckout(final Order order, final ViewController viewController) {
         FutureCallback<Details> callback = new FutureCallback<Details>() {
             @Override
             public void onSuccess(Details details) {
