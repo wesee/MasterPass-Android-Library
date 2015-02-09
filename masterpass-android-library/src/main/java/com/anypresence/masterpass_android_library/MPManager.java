@@ -174,9 +174,13 @@ public class MPManager implements ILightBox {
                             callback.onSuccess(preCheckoutResponse);
                         }
                     }
+
                     @Override
                     public void onFailure(Throwable throwable) {
                         Log.e(LOG_TAG, throwable.toString());
+                        // User is not paired. They may have disconnected via the MasterPass console.
+                        // We will optionally reset that pairing status here
+                        delegate.resetUserPairing();
                         callback.onFailure(new BadRequestException(throwable.toString()));
                     }
                 };
