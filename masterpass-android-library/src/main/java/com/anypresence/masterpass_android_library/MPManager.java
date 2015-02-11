@@ -152,7 +152,7 @@ public class MPManager implements ILightBox {
      * Retrieves the preCheckout data from the MasterPass service
      */
     public void preCheckout(final ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
-        checkoutPaired();
+        //checkoutPaired();
         viewController.runOnUiThread(new Runnable() {
             @Override
             public void run() {
