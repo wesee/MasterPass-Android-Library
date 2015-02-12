@@ -47,7 +47,7 @@ public class ConnectionUtil {
                     } else {
                         request = new HttpGet(url);
                     }
-                    request.setHeader("X-Session-Id", xSessionId);
+                    request.setHeader("Cookie", "_session_id=" + xSessionId);
                     response = client.execute(request);
                     if (response != null) {
                         StatusLine statusLine = response.getStatusLine();

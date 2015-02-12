@@ -18,10 +18,10 @@ public class Wallet implements Serializable {
     public String walletPartnerLogoUrl;
     @SerializedName(MASTERPASS_LOGO_URL_KEY)
     public String masterpassLogoUrl;
+    @SerializedName(PRE_CHECKOUT_TRANSACTION_ID_KEY)
+    public String preCheckoutTransactionId;
     @SerializedName(WALLET_NAME)
     String walletName;
-    @SerializedName(PRE_CHECKOUT_TRANSACTION_ID_KEY)
-    String preCheckoutTransactionId;
     @SerializedName(CONSUMER_WALLET_ID_KEY)
     String consumerWalletId;
 

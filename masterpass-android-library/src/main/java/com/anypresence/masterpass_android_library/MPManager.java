@@ -323,6 +323,7 @@ public class MPManager implements ILightBox {
             @Override
             public void onFailure(Throwable error) {
                 Log.e(LOG_TAG, "Error in Completed Checkout Successfully: " + error.toString());
+                delegate.pairCheckoutDidComplete(false, new PairCheckoutException(error.toString()));
             }
         };
         ConnectionUtil.call(true, getCompletePairCheckout(), viewController.getXSessionId(), order.getCompleteParams(), listener);

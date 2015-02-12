@@ -132,15 +132,10 @@ public class MPLightBox extends Activity {
                         public void onSuccess(JSONObject response) {
                             String responseString = response.toString();
                             Status status = new Gson().fromJson(responseString, Status.class);
-                            if (status != null && status.status == null) {
+                            if (status != null && status.status != null) {
                                 Intent returnIntent = new Intent();
-                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, true);
-                                setResult(RESULT_OK, returnIntent);
-                                finish();
-                            } else {
-                                Intent returnIntent = new Intent();
-                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, false);
-                                setResult(RESULT_CANCELED, returnIntent);
+                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, status.status);
+                                setResult(status.status.equals("success") ? RESULT_OK : RESULT_CANCELED, returnIntent);
                                 finish();
                             }
                         }
@@ -159,7 +154,7 @@ public class MPLightBox extends Activity {
                     //boolean post = false;
                     //if (json.length() != 1)
                     //  post = true;
-                    ConnectionUtil.call(false, urlConverted, xSessionId, null, listener);
+                    ConnectionUtil.call(false, url, xSessionId, null, listener);
 
                 } else {
                     web.loadUrl(url);
