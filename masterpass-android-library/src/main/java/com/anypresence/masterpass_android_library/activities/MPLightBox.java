@@ -133,9 +133,10 @@ public class MPLightBox extends Activity {
                             String responseString = response.toString();
                             Status status = new Gson().fromJson(responseString, Status.class);
                             if (status != null && status.status != null) {
+                                boolean success = status.status.equals("success");
                                 Intent returnIntent = new Intent();
-                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, status.status);
-                                setResult(status.status.equals("success") ? RESULT_OK : RESULT_CANCELED, returnIntent);
+                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, success);
+                                setResult(success ? RESULT_OK : RESULT_CANCELED, returnIntent);
                                 finish();
                             }
                         }
