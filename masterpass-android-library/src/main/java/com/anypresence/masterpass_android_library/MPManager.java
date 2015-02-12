@@ -306,7 +306,7 @@ public class MPManager implements ILightBox {
         ConnectionUtil.call(true, getPairAndCheckoutURL(), viewController.getXSessionId(), order.getParams(), listener);
     }
 
-    private void completePairCheckoutForOrder(Order order, ViewController viewController) {
+    public void completePairCheckoutForOrder(Order order, ViewController viewController) {
         FutureCallback<JSONObject> listener = new FutureCallback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject response) {

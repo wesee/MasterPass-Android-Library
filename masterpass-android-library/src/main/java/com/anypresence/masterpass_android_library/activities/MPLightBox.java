@@ -17,10 +17,14 @@ import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.util.ConnectionUtil;
 import com.google.gson.Gson;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 /**
  * Created by diego.rotondale on 16/09/2014.
@@ -87,6 +91,21 @@ public class MPLightBox extends Activity {
         return null;
     }
 
+    private JSONObject getJson(URI uri) {
+        JSONObject json = new JSONObject();
+        List<NameValuePair> parameters = URLEncodedUtils.parse(uri, "UTF-8");
+        if (parameters != null) {
+            for (NameValuePair p : parameters) {
+                try {
+                    json.put(p.getName(), p.getValue());
+                } catch (JSONException e) {
+                    Log.e(MPLightBox.class.getSimpleName(), e.getMessage());
+                }
+            }
+        }
+        return json;
+    }
+
     public enum MPLightBoxType {
         MPLightBoxTypeConnect(0),
         MPLightBoxTypeCheckout(1),
@@ -135,10 +154,16 @@ public class MPLightBox extends Activity {
                             finish();
                         }
                     };
+
+                    //JSONObject json = getJson(uri);
+                    //boolean post = false;
+                    //if (json.length() != 1)
+                    //  post = true;
                     ConnectionUtil.call(false, urlConverted, xSessionId, null, listener);
 
                 } else {
                     web.loadUrl(url);
+                    //web.postUrl(urlConverted, EncodingUtils.getBytes(uri.getQuery(), "BASE64"));
                     return false;
                 }
             } catch (URISyntaxException e) {

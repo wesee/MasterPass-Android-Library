@@ -80,6 +80,8 @@ public class LightBoxParams implements Serializable {
             json.put("callbackUrl", getCallbackURL());
         if (version != null)
             json.put("version", version);
+        if (details.pairingRequestToken != null)
+            json.put("pairingRequestToken", details.pairingRequestToken);
         if (order != null) {
             if (order.card != null)
                 json.put("cardId", order.card.cardId);
