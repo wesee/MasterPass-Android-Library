@@ -241,9 +241,9 @@ public class MPManager implements ILightBox {
             @Override
             public void onSuccess(Details details) {
                 LightBoxParams options = new LightBoxParams();
-                options.setRequestedDataTypes(null);
+                options.setRequestedDataTypes(delegate.getSupportedDataTypes());
                 options.setDetails(details);
-                options.setRequestPairing(null);
+                options.setRequestPairing(false);
                 options.setVersion(MP_VERSION);
                 options.setOrder(order);
                 showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);

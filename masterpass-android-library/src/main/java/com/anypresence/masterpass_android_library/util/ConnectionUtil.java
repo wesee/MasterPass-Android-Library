@@ -52,17 +52,18 @@ public class ConnectionUtil {
                     if (response != null) {
                         StatusLine statusLine = response.getStatusLine();
                         int statusCode = statusLine.getStatusCode();
-                        if (statusCode == 200) {
-                            InputStream in = response.getEntity().getContent();
+
+                        InputStream in = response.getEntity().getContent();
                             BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
                             StringBuilder responseStrBuilder = new StringBuilder();
 
                             String inputStr;
                             while ((inputStr = streamReader.readLine()) != null)
                                 responseStrBuilder.append(inputStr);
+                        if (statusCode == 200) {
                             listener.onSuccess(new JSONObject(responseStrBuilder.toString()));
                         } else {
-                            listener.onFailure(new Throwable());
+                            listener.onFailure(new Throwable(responseStrBuilder.toString()));
                         }
                     }
                 } catch (Exception e) {
