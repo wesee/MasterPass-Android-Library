@@ -6,17 +6,18 @@ import com.anypresence.masterpass_android_library.activities.MPLightBox;
 import com.anypresence.masterpass_android_library.dto.Details;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
 import com.anypresence.masterpass_android_library.dto.Order;
+import com.anypresence.masterpass_android_library.dto.PairCheckoutResponse;
 import com.anypresence.masterpass_android_library.dto.PreCheckoutResponse;
 import com.anypresence.masterpass_android_library.dto.StatusWithError;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
 import com.anypresence.masterpass_android_library.exception.BadRequestException;
+import com.anypresence.masterpass_android_library.exception.CheckoutException;
 import com.anypresence.masterpass_android_library.exception.ManualCheckoutException;
 import com.anypresence.masterpass_android_library.exception.NotPairedException;
 import com.anypresence.masterpass_android_library.exception.PairCheckoutException;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
 import com.anypresence.masterpass_android_library.interfaces.ILightBox;
 import com.anypresence.masterpass_android_library.interfaces.IManager;
-import com.anypresence.masterpass_android_library.interfaces.OnCompleteCallback;
 import com.anypresence.masterpass_android_library.interfaces.ViewController;
 import com.anypresence.masterpass_android_library.util.ConnectionUtil;
 import com.google.gson.Gson;
@@ -26,7 +27,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by diego.rotondale on 1/17/2015.
@@ -153,6 +153,7 @@ public class MPManager implements ILightBox {
      * Retrieves the preCheckout data from the MasterPass service
      */
     public void preCheckout(final ViewController viewController, final FutureCallback<PreCheckoutResponse> callback) {
+        //TODO:Check with David
         //checkoutPaired();
         viewController.runOnUiThread(new Runnable() {
             @Override
@@ -163,7 +164,6 @@ public class MPManager implements ILightBox {
                         String responseString = response.toString();
                         Log.d(LOG_TAG, "Received PreCheckout Data: " + responseString);
                         PreCheckoutResponse preCheckoutResponse = new Gson().fromJson(responseString, PreCheckoutResponse.class);
-                        //TODO:Check with David
                         if (preCheckoutResponse.hasError()) {
                             if (preCheckoutResponse.isNotPaired()) {
                                 // User is not paired. They may have disconnected via the MasterPass console.
@@ -220,12 +220,11 @@ public class MPManager implements ILightBox {
                 String responseString = response.toString();
                 Log.d(LOG_TAG, "Approved Return Checkout Request: " + responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
-                //TODO:Check with David
-                //if (details.hasError()) {
-                //callback.onFailure(new CheckoutException(details.errors));
-                //} else {
-                callback.onSuccess(details);
-                //}
+                if (details.hasError()) {
+                    callback.onFailure(new CheckoutException(details.errors));
+                } else {
+                    callback.onSuccess(details);
+                }
             }
 
             @Override
@@ -291,17 +290,16 @@ public class MPManager implements ILightBox {
                 String responseString = response.toString();
                 Log.d(LOG_TAG, "Approved Pair Checkout Request: " + responseString);
                 Details details = new Gson().fromJson(responseString, Details.class);
-                //TODO:Check with David
-                //if (details.hasError()) {
-                //  callback.onFailure(new CheckoutException(details.errors));
-                //} else {
-                callback.onSuccess(details);
-                //}
+                if (details.hasError()) {
+                    callback.onFailure(new CheckoutException(details.errors));
+                } else {
+                    callback.onSuccess(details);
+                }
             }
 
             @Override
             public void onFailure(Throwable error) {
-                Log.e(LOG_TAG, "Error Return Checkout Request: " + error.toString());
+                Log.e(LOG_TAG, "Error Return Pair Checkout Request: " + error.toString());
                 callback.onFailure(error);
             }
         };
@@ -362,13 +360,8 @@ public class MPManager implements ILightBox {
     }
 
     @Override
-    public void lightBoxDidCompletePreCheckout(ViewController lightBoxViewController, final Boolean success, final Map<Object, Object> data, final Throwable error) {
-        lightBoxViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
-            @Override
-            public void onComplete() {
-                delegate.preCheckoutDidComplete(success, data, error);
-            }
-        });
+    public void lightBoxDidCompletePreCheckout(ViewController lightBoxViewController, final Boolean success, final PairCheckoutResponse data, final Throwable error) {
+        delegate.preCheckoutDidComplete(success, data, error);
     }
 
     @Override

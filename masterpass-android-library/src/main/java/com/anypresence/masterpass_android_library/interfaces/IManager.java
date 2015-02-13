@@ -1,7 +1,8 @@
 package com.anypresence.masterpass_android_library.interfaces;
 
+import com.anypresence.masterpass_android_library.dto.PairCheckoutResponse;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by diego.rotondale on 1/19/2015.
@@ -65,7 +66,7 @@ public interface IManager {
      * @param data
      * @param error   any errors that occurred during checkout
      */
-    void preCheckoutDidComplete(Boolean success, Map<Object, Object> data, Throwable error);
+    void preCheckoutDidComplete(Boolean success, PairCheckoutResponse data, Throwable error);
 
     /**
      * Method that executes when pair & checkout completes

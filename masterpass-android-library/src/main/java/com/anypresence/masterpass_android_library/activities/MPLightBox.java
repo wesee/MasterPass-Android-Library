@@ -11,6 +11,7 @@ import android.webkit.WebViewClient;
 import com.anypresence.masterpass_android_library.Constants;
 import com.anypresence.masterpass_android_library.R;
 import com.anypresence.masterpass_android_library.dto.LightBoxParams;
+import com.anypresence.masterpass_android_library.dto.PairCheckoutResponse;
 import com.anypresence.masterpass_android_library.dto.Status;
 import com.anypresence.masterpass_android_library.dto.WebViewOptions;
 import com.anypresence.masterpass_android_library.interfaces.FutureCallback;
@@ -135,7 +136,12 @@ public class MPLightBox extends Activity {
                             if (status != null && status.status != null) {
                                 boolean success = status.status.equals("success");
                                 Intent returnIntent = new Intent();
-                                returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, success);
+                                if (type == MPLightBoxType.MPLightBoxTypePreCheckout) {
+                                    PairCheckoutResponse pairCheckoutResponse = new Gson().fromJson(responseString, PairCheckoutResponse.class);
+                                    returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, pairCheckoutResponse);
+                                } else {
+                                    returnIntent.putExtra(Constants.LIGHT_BOX_EXTRA, success);
+                                }
                                 setResult(success ? RESULT_OK : RESULT_CANCELED, returnIntent);
                                 finish();
                             }
