@@ -23,4 +23,24 @@ public class PreCheckoutResponse extends StatusWithError {
     public Contact contact;
     @SerializedName(TRANSACTION_ID_KEY)
     public String transactionId;
+
+    public CreditCard getDefaultCard() {
+        for (CreditCard card : cards) {
+            if (card.selectedAsDefault)
+                return card;
+        }
+        if (cards != null && !cards.isEmpty())
+            return cards.get(0);
+        return null;
+    }
+
+    public Address getDefaultAddress() {
+        for (Address address : addresses) {
+            if (address.selectedAsDefault)
+                return address;
+        }
+        if (addresses != null && !addresses.isEmpty())
+            return addresses.get(0);
+        return null;
+    }
 }
