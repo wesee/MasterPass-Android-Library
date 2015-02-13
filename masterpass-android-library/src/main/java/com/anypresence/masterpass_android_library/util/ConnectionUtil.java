@@ -54,12 +54,12 @@ public class ConnectionUtil {
                         int statusCode = statusLine.getStatusCode();
 
                         InputStream in = response.getEntity().getContent();
-                            BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                            StringBuilder responseStrBuilder = new StringBuilder();
+                        BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                        StringBuilder responseStrBuilder = new StringBuilder();
 
-                            String inputStr;
-                            while ((inputStr = streamReader.readLine()) != null)
-                                responseStrBuilder.append(inputStr);
+                        String inputStr;
+                        while ((inputStr = streamReader.readLine()) != null)
+                            responseStrBuilder.append(inputStr);
                         if (statusCode == 200) {
                             listener.onSuccess(new JSONObject(responseStrBuilder.toString()));
                         } else {

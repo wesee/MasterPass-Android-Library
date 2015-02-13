@@ -12,6 +12,7 @@ public class PreCheckoutResponse extends StatusWithError {
     public static final String SHIPPING_ADDRESSES_KEY = "shipping_addresses";
     public static final String WALLET_INFO_KEY = "wallet_info";
     public static final String CONTACT_KEY = "contact";
+    public static final String TRANSACTION_ID_KEY = "transaction_id";
 
     public List<CreditCard> cards;
     @SerializedName(SHIPPING_ADDRESSES_KEY)
@@ -20,4 +21,6 @@ public class PreCheckoutResponse extends StatusWithError {
     public Wallet walletInfo;
     @SerializedName(CONTACT_KEY)
     public Contact contact;
+    @SerializedName(TRANSACTION_ID_KEY)
+    public String transactionId;
 }

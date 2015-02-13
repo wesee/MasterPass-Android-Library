@@ -102,6 +102,7 @@ public class MPManager implements ILightBox {
                 options.setDetails(details);
                 options.setRequestPairing(true);
                 options.setVersion(MP_VERSION);
+                options.setType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect);
                 showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
             }
 
@@ -246,7 +247,8 @@ public class MPManager implements ILightBox {
                 options.setRequestPairing(false);
                 options.setVersion(MP_VERSION);
                 options.setOrder(order);
-                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
+                options.setType(MPLightBox.MPLightBoxType.MPLightBoxTypeCheckout);
+                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeCheckout, options, viewController);
             }
 
             @Override
@@ -270,8 +272,8 @@ public class MPManager implements ILightBox {
                 options.setAllowedCardType(delegate.getSupportedCardTypes());
                 options.setRequestPairing(true);
                 options.setVersion(MP_VERSION);
-                options.setType(LightBoxParams.MPLightBoxParamsType.Checkout);
-                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypeConnect, options, viewController);
+                options.setType(MPLightBox.MPLightBoxType.MPLightBoxTypePreCheckout);
+                showLightBoxWindowOfType(MPLightBox.MPLightBoxType.MPLightBoxTypePreCheckout, options, viewController);
             }
 
             @Override
@@ -371,12 +373,7 @@ public class MPManager implements ILightBox {
 
     @Override
     public void lightBoxDidCompleteCheckout(ViewController pairingViewController, final Boolean success, final Throwable error) {
-        pairingViewController.dismissViewControllerAnimated(true, new OnCompleteCallback() {
-            @Override
-            public void onComplete() {
-                delegate.checkoutDidComplete(success, error);
-            }
-        });
+        delegate.checkoutDidComplete(success, error);
     }
 
     public String getPreCheckoutURL() {

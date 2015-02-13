@@ -2,6 +2,8 @@ package com.anypresence.masterpass_android_library.dto;
 
 import android.util.Log;
 
+import com.anypresence.masterpass_android_library.activities.MPLightBox;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,13 +23,13 @@ public class LightBoxParams implements Serializable {
     private Boolean requestPairing;
     private List<String> allowedCardType;
     private Order order;
-    private MPLightBoxParamsType type;
+    private MPLightBox.MPLightBoxType type;
 
-    public MPLightBoxParamsType getType() {
+    public MPLightBox.MPLightBoxType getType() {
         return type;
     }
 
-    public void setType(MPLightBoxParamsType type) {
+    public void setType(MPLightBox.MPLightBoxType type) {
         this.type = type;
     }
 
@@ -58,10 +60,20 @@ public class LightBoxParams implements Serializable {
     public String toJson() {
         JSONObject json = new JSONObject();
         try {
-            if (this.type != null && this.type == MPLightBoxParamsType.Checkout) {
+            //PAIR CHECKOUT
+            if (type == MPLightBox.MPLightBoxType.MPLightBoxTypePreCheckout) {
                 getCheckoutParams(json);
-            } else {
+                return json.toString();
+            }
+            //PAIR
+            if (type == MPLightBox.MPLightBoxType.MPLightBoxTypeConnect) {
                 getParams(json);
+                return json.toString();
+            }
+            //RETURN CHECKOUT
+            if (type == MPLightBox.MPLightBoxType.MPLightBoxTypeCheckout) {
+                getReturnCheckoutParams(json);
+                return json.toString();
             }
         } catch (JSONException e) {
             Log.e(LightBoxParams.class.getSimpleName(), e.getMessage());
@@ -114,6 +126,31 @@ public class LightBoxParams implements Serializable {
             json.put("version", version);
     }
 
+
+    private void getReturnCheckoutParams(JSONObject json) throws JSONException {
+        if (details.callbackUrl != null)
+            json.put("callbackUrl", getCallbackURL());
+        if (order != null) {
+            if (order.card != null)
+                json.put("cardId", order.card.cardId);
+            if (order.shippingAddress != null)
+                json.put("shippingId", order.shippingAddress.addressId);
+            if (order.walletInfo != null) {
+                json.put("precheckoutTransactionId", order.walletInfo.preCheckoutTransactionId);
+                json.put("walletName", order.walletInfo.walletName);
+                json.put("consumerWalletId", order.walletInfo.consumerWalletId);
+            }
+        }
+        if (details.merchantCheckoutId != null)
+            json.put("merchantCheckoutId", details.merchantCheckoutId);
+        if (version != null)
+            json.put("version", version);
+        if (details.pairingRequestToken != null)
+            json.put("pairingRequestToken", details.pairingRequestToken);
+        if (details.checkoutRequestToken != null)
+            json.put("requestToken", details.checkoutRequestToken);
+    }
+
     public JSONArray getRequestDataTypes() {
         JSONArray jsonArray = new JSONArray();
         for (String supportedDataType : requestedDataTypes) {
@@ -132,16 +169,5 @@ public class LightBoxParams implements Serializable {
 
     public String getCallbackURL() {
         return details.callbackUrl.replace("\\", "");
-    }
-
-    public enum MPLightBoxParamsType {
-        Checkout(0),
-        MPLightBoxTypeCheckout(1),;
-
-        public int value;
-
-        MPLightBoxParamsType(int value) {
-            this.value = value;
-        }
     }
 }
