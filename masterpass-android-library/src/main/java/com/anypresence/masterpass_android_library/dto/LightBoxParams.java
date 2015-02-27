@@ -135,6 +135,8 @@ public class LightBoxParams implements Serializable {
                 json.put("cardId", order.card.cardId);
             if (order.shippingAddress != null)
                 json.put("shippingId", order.shippingAddress.addressId);
+            else
+                json.put("shippingId", null);
             if (order.walletInfo != null) {
                 json.put("precheckoutTransactionId", order.walletInfo.preCheckoutTransactionId);
                 json.put("walletName", order.walletInfo.walletName);
